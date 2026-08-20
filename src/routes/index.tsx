@@ -1,6 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
 import {
-  Apple,
   Backpack,
   Briefcase,
   ChevronDown,
@@ -32,7 +31,6 @@ import beltImg from "@/assets/p-belt.jpg";
 import duffelImg from "@/assets/p-duffel.jpg";
 import cardholderImg from "@/assets/p-cardholder.jpg";
 import crossbodyImg from "@/assets/p-crossbody.jpg";
-import bootsImg from "@/assets/p-boots.jpg";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -244,7 +242,6 @@ function Index() {
           ))}
           <a href="#" className="flex w-24 flex-col items-center gap-3 text-center">
             <span className="flex h-20 w-20 items-center justify-center rounded-full border-2 border-dashed border-primary text-primary">
-              <Apple className="hidden" />
               <span className="text-lg font-bold">→</span>
             </span>
             <span className="text-xs font-semibold leading-tight text-primary">
