@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- TODO: prefix each <loc> with the project's base URL once a domain is set. -->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>/</loc><changefreq>weekly</changefreq><priority>1.0</priority></url>
+  <url><loc>/category/bags</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>/category/wallets</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>/category/belts</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>/category/footwear</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>/category/travel</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
+  <url><loc>/product/marlow-full-grain-tote</loc><priority>0.8</priority></url>
+  <url><loc>/product/ashcroft-bifold-wallet</loc><priority>0.8</priority></url>
+  <url><loc>/product/hand-braided-tan-belt</loc><priority>0.8</priority></url>
+  <url><loc>/product/voyager-weekender-duffel</loc><priority>0.8</priority></url>
+  <url><loc>/product/slimline-card-holder</loc><priority>0.8</priority></url>
+  <url><loc>/product/hawthorn-crossbody-bag</loc><priority>0.8</priority></url>
+  <url><loc>/product/brackenridge-derby-boots</loc><priority>0.8</priority></url>
+  <url><loc>/product/penhurst-leather-loafers</loc><priority>0.8</priority></url>
+  <url><loc>/product/ridgeline-laptop-briefcase</loc><priority>0.8</priority></url>
+  <url><loc>/product/solid-cut-dress-belt</loc><priority>0.8</priority></url>
+  <url><loc>/product/atlas-cabin-holdall</loc><priority>0.8</priority></url>
+  <url><loc>/product/traveller-passport-sleeve</loc><priority>0.8</priority></url>
+  <url><loc>/product/zip-around-travel-wallet</loc><priority>0.8</priority></url>
+  <url><loc>/product/everyday-leather-backpack</loc><priority>0.8</priority></url>
+</urlset>
