@@ -1,314 +1,292 @@
-# Artisan Leather Goods
+# 👜 Terracotta Leather Co. — Artisan Leather Goods E-Commerce Platform
 
-# Leather Goods E-Commerce — Build Prompt
-
-### (Same layout/theme as the reference screenshots, reskinned for leather products)
-
-
-
-Build a homepage using the **exact same layout structure and UI pattern**
-
-as the reference "NatureCart" grocery site screenshots, but reskinned
-
-entirely for a premium leather goods brand — same blocks, same
-
-component shapes, same information hierarchy, different palette and
-
-content.
-
-
+A production-grade, full-stack artisan leather goods e-commerce platform built with **React 19**, **TanStack Start (SSR / Vite / Nitro)**, **Tailwind CSS v4**, **NestJS**, **Drizzle ORM**, and **Neon PostgreSQL**.
 
 ---
 
-
-
-## 1. PALETTE & TYPE (swap nature-green for leather warmth)
-
-
-
-```
-
-Replace:  Green (#2E7D32-ish) + white + light mint backgrounds
-
-With:     Deep cognac/tan (#8B5A2B or similar) + black + warm cream/
-
-          off-white backgrounds. One accent: a muted gold or brass tone
-
-          for badges/CTAs instead of the reference's green buttons.
-
-Typography: Keep the same weight/size hierarchy as the reference (bold
-
-          sans-serif headline, clean body text) — just recolor.
-
-Icons:    Same circular icon treatment for the category row, swapped to
-
-          leather-relevant line icons (bag, wallet, belt, boot, etc.)
-
-```
-
-
+## 📖 Table of Contents
+- [Overview & Architecture](#-overview--architecture)
+- [How the System Works](#-how-the-system-works)
+- [All Pages & Routes Sitemap](#-all-pages--routes-sitemap)
+- [Key Features & Capabilities](#-key-features--capabilities)
+- [Repository Structure](#-repository-structure)
+- [Getting Started Locally](#-getting-started-locally)
+- [Environment Variables](#-environment-variables)
+- [Deployment Guide](#-deployment-guide)
 
 ---
 
-
-
-## 2. TOP UTILITY BAR
-
-*(same strip as the reference, left/right split text)*
-
-```
-
-Left:  "Free Shipping on Orders Above ₹2,999"
-
-Right: "Handcrafted Leather Goods Since 1998" (swap for the reference's
-
-       "Delivering happiness in Maharashtra since...")
-
-```
-
-
-
-## 3. NAVBAR
-
-*(same layout: logo left, search center, account icons right)*
-
-```
-
-Logo:      "[BRAND NAME]" with a small leather-strap/stitch icon accent
-
-           (replacing the reference's leaf icon)
-
-Location:  Replace "Deliver to: USA" with a "Find a Store" link, or drop
-
-           this element if the brand ships nationwide only
-
-Search:    Same full-width search bar, placeholder "Search for bags,
-
-           wallets, belts..."
-
-Right icons: Login/Sign Up, Wishlist, Cart — identical positions/icons
-
-           to the reference
-
-Second row: "Shop by Category" dropdown + nav links:
-
-           Home · Categories · New Arrivals · Combo Sets · Brands ·
-
-           Care Guide · Contact Us
-
-           (mirrors the reference's Home/Categories/Offers/Combo
-
-           Store/Brands/Household/Personal Care/Contact Us row)
-
-```
-
-
-
-## 4. HERO SECTION
-
-*(same two-column layout: text+CTAs left, product image right, circular badge overlapping)*
-
-```
-
-Eyebrow line: "FULL-GRAIN. HAND-STITCHED." (small label above headline,
-
-              same weight as the reference's "FAST. FRESH. RELIABLE.")
-
-Headline:     "Leather Crafted / to Last a Lifetime" (two-line bold
-
-              headline, same size/position as "Groceries Delivered in
-
-              60 Minutes")
-
-Subtext:      "Everything from everyday carry to travel essentials —
-
-              made from full-grain leather that only gets better with age."
-
-Buttons:      "Shop Now" (solid) + "View Collection" (outline) — same
-
-              button shapes/positions as "Shop Now" / "View Offers"
-
-Right image:  A styled leather tote/bag with accessories spilling out
-
-              (mirrors the reference's grocery bag with vegetables),
-
-              same soft drop shadow
-
-Badge circle: Replace "60 MINUTE DELIVERY" badge with "LIFETIME
-
-              WARRANTY" or "100% GENUINE LEATHER" in the same
-
-              circular badge position (overlapping the hero image, top right)
-
-```
-
-
-
-## 5. CATEGORY ICON ROW
-
-*(same circular icon + label row directly under the hero)*
-
-```
-
-Bags & Totes · Wallets & Cardholders · Belts · Jackets & Outerwear ·
-
-Footwear · Travel & Duffels · Accessories · View All Categories →
-
-(same 7-icons-plus-"view all" layout as Fruits & Vegetables / Dairy &
-
-Breakfast / Staples & Pulses / etc.)
-
-```
-
-
-
-## 6. "TOP OFFERS FOR YOU" SECTION
-
-*(same 4-card row, colored % badge top-left of each card)*
-
-```
-
-Card 1: "UP TO 30% OFF" — on Wallets & Cardholders
-
-Card 2: "FREE SHIPPING" — on Orders Above ₹2,999
-
-Card 3: "UP TO 25% OFF" — on Travel Bags
-
-Card 4: "₹500 OFF" — on First Order
-
-(each card: product image + badge + "Shop Now" button, identical shape
-
-to the reference's oil/grocery/personal-care offer cards)
-
-```
-
-
-
-## 7. "BEST SELLING PRODUCTS" SECTION
-
-*(same horizontal product card row, "View All Products" link top-right)*
-
-```
-
-5-6 product cards: product image, name, strikethrough MRP + sale price,
-
-"Add to Cart" button — same card component as the reference's grocery
-
-product tiles (Apple, Basmati Rice, etc. → swap for a Leather Tote,
-
-Bifold Wallet, Braided Belt, Weekender Duffel, Card Holder, Crossbody Bag)
-
-```
-
-
-
-## 8. TRUST BADGE STRIP
-
-*(same 4-icon row directly above the footer)*
-
-```
-
-100% Genuine Leather · Secure Payments · Easy 7-Day Returns · 24/7 Support
-
-(same icon-plus-label layout as the reference's 100% Genuine / Secure
-
-Payments / Easy Returns / 24/7 Support strip)
-
-```
-
-
-
-## 9. NEWSLETTER STRIP
-
-*(same full-width colored band with email input)*
-
-```
-
-"Stay Updated with Best Offers" + email input + "Subscribe" button —
-
-identical layout/position to the reference, recolored to the leather
-
-palette (dark brown/black band instead of green)
-
-```
-
-
-
-## 10. FOOTER
-
-*(same 3-column layout + app badges + social icons)*
-
-```
-
-Shop | Customer Service | My Account — same column structure as the
-
-reference, links swapped to leather-relevant items (Shop: All Bags,
-
-Wallets, Belts, New Arrivals; Customer Service: Track Order, Shipping &
-
-Returns, Leather Care Guide; My Account: Login/Sign Up, Order History)
-
-Same app store badges + social icon row at the bottom
-
-```
-
-
+## 🏛 Overview & Architecture
+
+Terracotta Leather Co. is structured as a monorepo consisting of two interconnected services:
+
+1. **Frontend Storefront & Admin Portal (`artisan-leather-goods-main`)**:
+   - Built with **React 19** and **TanStack Start** for server-side rendering (SSR), file-based routing, and sub-100ms page delivery via Nitro.
+   - Styled with **Tailwind CSS v4** in a warm, artisanal leather palette (terracotta cognac `#8C4A32`, rich tan, warm cream `#FDFBF7`, and dark ink).
+   - Fully interactive components powered by Radix UI and Lucide icons.
+
+2. **Backend REST API (`tanner-co-leather-backend`)**:
+   - Built with **NestJS**, **TypeScript**, and **Drizzle ORM** connected to a serverless **Neon PostgreSQL** database.
+   - Comprehensive modules for Catalog, Authentication, Cart, Wishlist, Saved Addresses, Orders, Reviews, Image Uploads, and Payments.
+   - Integrated with **Razorpay** for online card, UPI, and net banking payments, and **Backblaze B2 / AWS S3** for image hosting.
 
 ---
 
+## ⚙ How the System Works
 
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    STOREFRONT & ADMIN UI                    │
+│      (React 19 + TanStack Start SSR + Tailwind CSS v4)      │
+└───────────────▲─────────────────────────────▲───────────────┘
+                │                             │
+       REST API │ (Bearer JWT)       Razorpay │ Payment Modal
+                ▼                             ▼
+┌───────────────────────────────┐     ┌───────────────────────┐
+│     NESTJS REST BACKEND       │     │   RAZORPAY GATEWAY    │
+│  (Auth, Orders, Admin, Image) │◄────┤  (Cards, UPI, NetB)   │
+└───────────────┬───────────────┘     └───────────────────────┘
+                │
+                ├─────────────────────────────┐
+                ▼                             ▼
+┌───────────────────────────────┐   ┌─────────────────────────┐
+│        NEON POSTGRESQL        │   │    BACKBLAZE B2 / S3    │
+│   (Users, Orders, Catalog)    │   │  (Presigned CDN Upload) │
+└───────────────────────────────┘   └─────────────────────────┘
+```
 
-## WHAT TO ASK THE BUILDER FOR
-
-
-
-> "Build a homepage for [Leather], a premium leather goods e-commerce
-
-> site, using this exact section-by-section layout: top utility bar,
-
-> navbar with search + account icons, two-column hero with a circular
-
-> badge overlapping the product image, a circular category icon row,
-
-> a 4-card offers row, a best-sellers product row, a trust-badge strip,
-
-> a newsletter band, and a 3-column footer with app badges. Recolor
-
-> everything from the reference nature-green palette to a leather-toned
-
-> palette (cognac/tan, black, warm cream, muted gold accent), and swap
-
-> all copy/imagery to leather products (bags, wallets, belts, footwear,
-
-> travel goods)."
-
-
+1. **Browsing & Cart**: Patrons browse collections with instant client-side and server-rendered catalogs. Guest users receive a unique session cart ID, which automatically merges upon login.
+2. **Checkout Flow**: Customers select or add shipping addresses (`/account`), apply discount coupon codes, and choose between **Cash on Delivery (COD)** or **Razorpay Online Payment**.
+3. **Razorpay Online Payments**: Razorpay checkout initializes dynamically with signature validation (`HMAC SHA-256`) on the backend before order confirmation.
+4. **Order Fulfillment & Lifecycle**: Once placed, orders enter the tracking pipeline (`pending` ➔ `confirmed` ➔ `processing` ➔ `shipped` ➔ `delivered`) where admins assign carrier tracking IDs.
+5. **Customer Reviews**: Patrons submit star ratings and reviews which are held in a moderation queue for administrator approval.
+6. **Administrator Control**: Admins manage products, categories, stock, orders, reviews, and customer accounts directly from `/admin`.
 
 ---
 
+## 🗺 All Pages & Routes Sitemap
 
+The frontend application includes **10 core routes**:
 
-Fill in `[Leather]` and swap in real product photography before handing
+| Route / Page | URL Path | Description & Capabilities |
+| :--- | :--- | :--- |
+| **Homepage** | `/` | Hero section, category row, promo banner cards, featured best-sellers, brand craftsmanship story, trust badges, and newsletter signup. |
+| **Category Catalog** | `/category/$slug` | Dynamic category collections (`bags`, `wallets`, `belts`, `footwear`, `travel`) with sorting (price, rating, name) and price range filters. |
+| **Product Detail** | `/product/$slug` | Product imagery carousel, live stock counter, color & size variant selector, craftsmanship specs, customer review breakdown, and "Write Review" modal. |
+| **Cart** | `/cart` | Full cart review page with quantity adjusters, variant switchers, order subtotal, and checkout CTA. |
+| **Checkout** | `/checkout` | 1-Click saved address selector, new address creator, coupon code input, and Razorpay / COD payment gateway. |
+| **Order Confirmed** | `/order-confirmed` | Post-checkout success screen showing order ID, items breakdown, shipping address, and tracking link. |
+| **Order Tracker** | `/orders` | Real-time order progress timeline with milestone statuses, carrier tracking links, and chronological order history. |
+| **Wishlist** | `/wishlist` | Saved patron favorites with instant 1-click "Move to Cart" actions. |
+| **Customer Account** | `/account` | Patron profile details (name, email, phone) and multi-address shipping book with default address toggles. |
+| **Admin Portal** | `/admin` | Complete store manager featuring Dashboard KPIs, Products CRUD, Categories CRUD, Order fulfillment, Review moderation, and Customer directory. |
 
-this to your builder or developer.
+---
 
-This project was built with [Lovable](https://lovable.dev).
+## ✨ Key Features & Capabilities
 
-## Build with Lovable
+### 🛍️ E-Commerce Storefront
+- **Dynamic Variant Engine**: Live price and stock updates when switching product colors (Cognac Tan, Espresso, Matte Black) and sizes.
+- **Customer Ratings & Reviews**: 5-star distribution graphs, verified buyer badges, user reviews feed, and modal review submission.
+- **Slideout Cart Drawer & Page**: Slideout cart drawer accessible from anywhere on the site with real-time total updates.
+- **Server-Synced Wishlist**: Saved items persist across devices when logged into patron accounts.
 
-Continue developing this project in the [Lovable editor](https://lovable.dev/projects/0bfc3bd5-4cb3-4e89-a96d-2f2eae6004b8).
+### 💳 Checkout & Payments
+- **Razorpay Online Payment Gateway**: Supports Indian & international Credit/Debit Cards, UPI (Google Pay, PhonePe, Paytm), and NetBanking.
+- **1-Click Address Selector**: Automatically pulls saved patron addresses for instant checkout.
+- **Coupon Code Engine**: Percentage and fixed discount codes (e.g. `WELCOME10`, `FESTIVE500`).
 
-- **Ship faster**: describe what you want to build and Lovable handles the code.
-- **Stay in sync**: every change made in Lovable is committed straight to this repository.
-- **Full ownership**: this code is yours. Push to `main` on GitHub and your changes sync back into Lovable, ready for your next prompt.
+### 🚚 Order Tracking & Notifications
+- **Visual Progress Bar**: Visual milestone indicator from pending to delivered.
+- **Carrier Tracking**: Displays courier partner name and tracking number with 1-click clipboard copy.
 
-## Development
+### 🛡️ Admin Portal (`/admin`)
+- **Dashboard Metrics**: Real-time sales revenue, today's order count, VIP customer tally, and low-stock variant warnings.
+- **Product Management**: Create, edit, and delete products, manage inventory variants, and upload images.
+- **Category Management**: Create and reorganize store categories with custom slugs, banners, and icons.
+- **Order Fulfillment**: Update order states, add tracking numbers, and view customer invoice breakdowns.
+- **Review Moderation**: Approve pending customer reviews before publishing live to the storefront.
+- **Customer Directory**: View patron profiles, total orders count, lifetime spend, restrict/unblock access, or promote to administrator.
 
-Prefer working locally? You need Node.js and npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
+---
 
-```sh
-git clone <this-repository-url>
-cd <repository-name>
-npm i
-npm run dev
+## 📁 Repository Structure
+
 ```
+artisan-leather-goods/
+├── artisan-leather-goods-main/          # Frontend Application (TanStack Start + React 19)
+│   ├── src/
+│   │   ├── assets/                      # High-res local product photography assets
+│   │   ├── components/
+│   │   │   ├── admin/                   # Admin CRUD modals & customer dossier dialogs
+│   │   │   ├── layout/                  # SiteHeader, Footer, Navigation
+│   │   │   ├── review/                  # ReviewModal, ReviewList, StarRating
+│   │   │   └── ui/                      # Radix UI components (Dialog, Dropdown, Button, etc.)
+│   │   ├── data/                        # Static fallback catalog & INR currency formatters
+│   │   ├── lib/
+│   │   │   ├── api.ts                   # Type-safe API client for backend communication
+│   │   │   ├── store.ts                 # Client state store (Zustand/Context)
+│   │   │   └── utils.ts                 # Utility functions (cn, clsx)
+│   │   ├── routes/                      # TanStack file-based routes
+│   │   │   ├── index.tsx                # Homepage
+│   │   │   ├── category.$slug.tsx       # Category catalog
+│   │   │   ├── product.$slug.tsx        # Product detail page
+│   │   │   ├── cart.tsx                 # Shopping cart
+│   │   │   ├── checkout.tsx             # Checkout & Razorpay
+│   │   │   ├── order-confirmed.tsx      # Order confirmation
+│   │   │   ├── orders.tsx               # Order tracking timeline
+│   │   │   ├── wishlist.tsx             # Saved wishlist
+│   │   │   ├── account.tsx              # Customer profile & addresses
+│   │   │   └── admin.tsx                # Admin control center
+│   │   ├── main.tsx                     # React root mount
+│   │   └── routeTree.gen.ts             # Auto-generated TanStack route tree
+│   ├── package.json
+│   └── vite.config.ts
+│
+├── tanner-co-leather-backend/           # Backend API Service (NestJS + Drizzle)
+│   └── leather-goods-nest/
+│       ├── src/
+│       │   ├── admin/                   # Admin dashboard & customer management
+│       │   ├── auth/                    # JWT auth, bcrypt hashing, Google OAuth
+│       │   ├── cart/                    # Cart & guest session persistence
+│       │   ├── categories/              # Category CRUD
+│       │   ├── checkout/                # Checkout & address resolution
+│       │   ├── coupons/                 # Coupon discount validation
+│       │   ├── database/                # Drizzle schema definitions & seed scripts
+│       │   ├── mail/                    # Transactional email service (Resend)
+│       │   ├── orders/                  # Order placement & fulfillment
+│       │   ├── payments/                # Razorpay order generation & verification
+│       │   ├── products/                # Product catalog & variant queries
+│       │   ├── reviews/                 # Customer reviews & moderation
+│       │   ├── upload/                  # S3/B2 presigned image uploads
+│       │   ├── users/                   # Profile & saved address management
+│       │   ├── wishlist/                # Saved patron wishlist
+│       │   └── main.ts                  # NestJS bootstrap entrypoint
+│       ├── package.json
+│       └── tsconfig.json
+│
+├── .gitignore                           # Repository-wide ignore rules
+└── README.md                            # Project documentation
+```
+
+---
+
+## 🚀 Getting Started Locally
+
+### Prerequisites
+- **Node.js**: v20.x or later
+- **npm**: v10.x or later
+- **PostgreSQL Database**: Neon serverless Postgres or local PostgreSQL instance.
+
+---
+
+### Step 1: Clone the Repository
+```bash
+git clone https://github.com/amohdanas125/artisan-leather-goods.git
+cd artisan-leather-goods
+```
+
+---
+
+### Step 2: Set Up & Start Backend
+1. Navigate to the backend directory:
+   ```bash
+   cd tanner-co-leather-backend/leather-goods-nest
+   ```
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+3. Create your `.env` file (copy from `.env.example`):
+   ```bash
+   cp .env.example .env
+   ```
+4. Configure your `DATABASE_URL` and `JWT_SECRET` in `.env`.
+5. Start the backend server:
+   ```bash
+   npm run start:dev
+   ```
+   *The backend will be available at `http://localhost:4000/api`.*
+
+---
+
+### Step 3: Set Up & Start Frontend
+1. In a new terminal window, navigate to the frontend directory:
+   ```bash
+   cd artisan-leather-goods-main
+   ```
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+3. Start the Vite development server:
+   ```bash
+   npm run dev
+   ```
+   *The storefront will be live at `http://localhost:8080` (or `http://localhost:3000`).*
+
+---
+
+### 🔑 Default Administrator Credentials
+- **Admin Email**: `admin@tannerandco.com`
+- **Admin Password**: `Admin@12345`
+- **Admin Portal**: Open `http://localhost:8080/admin` in your browser.
+
+---
+
+## 🔐 Environment Variables
+
+### Backend (`tanner-co-leather-backend/leather-goods-nest/.env`)
+```ini
+PORT=4000
+NODE_ENV=development
+FRONTEND_URL="http://localhost:3000"
+
+# Neon PostgreSQL Database
+DATABASE_URL="postgresql://user:password@host/neondb?sslmode=require"
+
+# JWT Secret
+JWT_SECRET="your-strong-random-secret-key"
+JWT_EXPIRES_IN="7d"
+
+# Backblaze B2 / AWS S3 (Image Uploads)
+B2_APPLICATION_KEY_ID=""
+B2_APPLICATION_KEY=""
+B2_BUCKET_NAME="LeatherGoods"
+B2_ENDPOINT="https://s3.us-east-005.backblazeb2.com"
+B2_REGION="us-east-005"
+B2_PUBLIC_URL_BASE=""
+
+# Payments (Razorpay)
+RAZORPAY_KEY_ID=""
+RAZORPAY_KEY_SECRET=""
+
+# Transactional Email (Resend)
+RESEND_API_KEY=""
+RESEND_FROM_EMAIL="Terracotta Leather Co. <no-reply@tannerandco.com>"
+```
+
+### Frontend (`artisan-leather-goods-main/.env`)
+```ini
+# Backend API Base URL
+VITE_API_URL="http://localhost:4000/api"
+```
+
+---
+
+## 🌐 Deployment Guide
+
+### Deploying the Backend (Render / Railway / AWS / Docker)
+* **Build Command**: `npm run build`
+* **Start Command**: `node dist/main.js`
+* Set all production environment variables listed above.
+
+### Deploying the Frontend (Cloudflare Pages / Vercel / Netlify)
+* **Build Command**: `npm run build`
+* **Output Directory**: `.output/public` (or `.output` for Cloudflare Workers)
+* **Environment Variable**: `VITE_API_URL=https://your-production-backend-api.com/api`
+
+---
+
+## 📄 License
+This project is licensed under the MIT License. Handcrafted with passion for artisan leather goods.
