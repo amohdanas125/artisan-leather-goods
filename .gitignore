@@ -4,6 +4,7 @@ node_modules/
 
 # Production builds
 dist/
+dist-ssr/
 */dist/
 .output/
 */.output/
@@ -11,10 +12,13 @@ dist/
 */.nitro/
 .vite/
 */.vite/
-.tanstack/
-*/.tanstack/
+.vinxi/
+*/.vinxi/
+.tanstack/**
+*/.tanstack/**
 .wrangler/
 */.wrangler/
+.dev.vars
 
 # Environment variables
 .env
@@ -29,9 +33,16 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
+lerna-debug.log*
 
 # Editor & OS
 .DS_Store
 Thumbs.db
-.vscode/
+.vscode/*
+!.vscode/extensions.json
 .idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
