@@ -241,8 +241,8 @@ export function SiteHeader() {
           </div>
         </div>
 
-        <div className="border-t border-border bg-cream">
-          <div className="mx-auto flex max-w-7xl items-center gap-3 sm:gap-6 overflow-x-auto px-4 py-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        <div className="border-t border-border bg-cream relative">
+          <div className="mx-auto flex max-w-7xl items-center gap-3 sm:gap-6 px-4 py-2">
             {/* Shop by Category hover dropdown */}
             <div
               ref={containerRef}
@@ -326,7 +326,7 @@ export function SiteHeader() {
               )}
             </div>
 
-            <nav className="flex items-center gap-4 sm:gap-6 whitespace-nowrap text-xs sm:text-sm font-medium text-secondary-foreground shrink-0">
+            <nav className="flex flex-1 items-center gap-4 sm:gap-6 overflow-x-auto whitespace-nowrap text-xs sm:text-sm font-medium text-secondary-foreground [scrollbar-width:none] [&::-webkit-scrollbar]:hidden py-1">
               {navLinks.map((l) => (
                 <Link
                   key={l.label}
