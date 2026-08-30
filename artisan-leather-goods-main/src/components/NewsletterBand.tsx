@@ -39,9 +39,9 @@ export function NewsletterBand({ source }: { source: string }) {
             onChange={(e) => setEmail(e.target.value)}
             placeholder="Enter your email address"
             aria-label="Email address"
-            className="h-12 w-full flex-1 rounded-full bg-card px-5 text-sm outline-none placeholder:text-muted-foreground focus:ring-2 focus:ring-accent"
+            className="h-12 w-full flex-1 rounded-full bg-card px-5 text-sm outline-none placeholder:text-muted-foreground focus:ring-2 focus:ring-primary"
           />
-          <button className="h-12 w-full sm:w-auto shrink-0 rounded-full bg-accent px-7 text-sm font-bold text-accent-foreground transition-colors hover:bg-accent/90 cursor-pointer">
+          <button className="h-12 w-full sm:w-auto shrink-0 rounded-full bg-primary px-7 text-sm font-bold text-primary-foreground transition-colors hover:bg-primary-dark cursor-pointer shadow-md">
             {done ? "Subscribed" : "Subscribe"}
           </button>
         </form>

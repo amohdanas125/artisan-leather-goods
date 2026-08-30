@@ -230,7 +230,7 @@ function ProductPage() {
           </h1>
 
           <div className="mt-3 flex items-center gap-2 text-sm">
-            <span className="flex items-center gap-1 rounded-full bg-accent px-2 py-0.5 text-xs font-bold text-accent-foreground">
+            <span className="flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-bold text-primary">
               <Star className="h-3.5 w-3.5 fill-current" />
               {product.rating.toFixed(1)}
             </span>
@@ -333,7 +333,7 @@ function ProductPage() {
             </button>
           </div>
 
-          <ul className="mt-8 space-y-2 rounded-2xl border border-border bg-cream p-5">
+          <ul className="mt-8 space-y-2 rounded-2xl border border-border bg-card p-5">
             {product.details.map((d) => (
               <li key={d} className="flex items-start gap-2 text-sm text-secondary-foreground">
                 <Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" />

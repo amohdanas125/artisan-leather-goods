@@ -119,7 +119,7 @@ function CartPage() {
               ))}
             </div>
 
-            <aside className="h-fit rounded-2xl border border-border bg-cream p-6 shadow-card lg:sticky lg:top-32">
+            <aside className="h-fit rounded-2xl border border-border bg-card p-6 shadow-card lg:sticky lg:top-32">
               <h2 className="text-lg font-extrabold text-ink">Order Summary</h2>
               <dl className="mt-4 space-y-3 text-sm">
                 <div className="flex justify-between">
@@ -143,7 +143,7 @@ function CartPage() {
               </dl>
 
               {subtotal > 0 && subtotal < SHIPPING_THRESHOLD && (
-                <p className="mt-4 rounded-xl bg-accent/25 p-3 text-xs font-semibold text-ink">
+                <p className="mt-4 rounded-xl bg-primary/10 p-3 text-xs font-semibold text-primary">
                   Add {inr(SHIPPING_THRESHOLD - subtotal)} more for free shipping.
                 </p>
               )}

@@ -104,7 +104,7 @@ function Index() {
       <SiteHeader />
 
       {/* Hero */}
-      <section className="bg-cream">
+      <section className="bg-muted/30">
         <div className="mx-auto grid max-w-7xl items-center gap-10 px-4 py-14 lg:grid-cols-2 lg:py-20">
           <div>
             <p className="text-xs font-bold tracking-[0.25em] text-primary">
@@ -147,7 +147,7 @@ function Index() {
               height={1104}
               className="w-full rounded-3xl object-cover shadow-product"
             />
-            <div className="absolute right-2 -top-4 sm:-right-2 sm:-top-6 flex h-24 w-24 sm:h-28 sm:w-28 lg:h-32 lg:w-32 flex-col items-center justify-center rounded-full bg-accent text-center text-accent-foreground shadow-card">
+            <div className="absolute right-2 -top-4 sm:-right-2 sm:-top-6 flex h-24 w-24 sm:h-28 sm:w-28 lg:h-32 lg:w-32 flex-col items-center justify-center rounded-full bg-primary text-center text-primary-foreground shadow-card border border-white/20">
               <Sparkles className="mb-1 h-4 w-4 sm:h-5 sm:w-5" />
               <span className="px-2 text-[10px] sm:text-[11px] font-extrabold uppercase leading-tight tracking-wide">
                 100% Genuine Leather
@@ -179,7 +179,7 @@ function Index() {
                 params={{ slug }}
                 className="group flex w-20 shrink-0 flex-col items-center gap-2.5 text-center sm:w-24 sm:gap-3"
               >
-                <span className="flex h-16 w-16 items-center justify-center rounded-full bg-cream transition-colors group-hover:bg-primary group-hover:text-primary-foreground sm:h-20 sm:w-20">
+                <span className="flex h-16 w-16 items-center justify-center rounded-full bg-muted transition-colors group-hover:bg-primary group-hover:text-primary-foreground sm:h-20 sm:w-20">
                   <Icon
                     className="h-7 w-7 text-primary transition-colors group-hover:text-primary-foreground sm:h-8 sm:w-8"
                     strokeWidth={1.5}
@@ -221,8 +221,8 @@ function Index() {
               onClick={() => track("promo_click", { promo: o.badge, title: o.title })}
               className="group relative flex flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-card transition-all hover:shadow-lg"
             >
-              <div className="relative aspect-[4/3] w-full overflow-hidden bg-cream">
-                <span className="absolute left-3.5 top-3.5 z-10 rounded-full bg-accent px-3 py-1 text-[11px] font-extrabold uppercase text-accent-foreground shadow-xs">
+              <div className="relative aspect-[4/3] w-full overflow-hidden bg-card border-b border-border/40">
+                <span className="absolute left-3.5 top-3.5 z-10 rounded-full bg-primary px-3 py-1 text-[11px] font-extrabold uppercase text-primary-foreground shadow-xs">
                   {o.badge}
                 </span>
                 <img

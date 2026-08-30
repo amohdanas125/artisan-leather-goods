@@ -151,7 +151,7 @@ function CategoryPage() {
         <span className="text-ink">{category.label}</span>
       </nav>
 
-      <section className="bg-cream">
+      <section className="bg-card border-b border-border/40">
         <div className="mx-auto grid max-w-7xl items-center gap-8 px-4 py-10 lg:grid-cols-[1fr_auto]">
           <div>
             <h1 className="text-4xl font-extrabold leading-tight text-ink lg:text-5xl">

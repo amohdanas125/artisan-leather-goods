@@ -86,7 +86,7 @@ export function SiteHeader() {
         <div className="mx-auto flex max-w-7xl items-center justify-center sm:justify-between gap-4 px-4 py-1.5 sm:py-2 text-xs sm:text-[13px]">
           <span className="text-center truncate">Free Shipping on Orders Above ₹2,999</span>
           <div className="hidden sm:flex items-center gap-4 text-xs font-medium shrink-0">
-            <span className="text-accent">Handcrafted Leather Since 1998</span>
+            <span className="text-primary-foreground/80">Handcrafted Leather Since 1998</span>
           </div>
         </div>
       </div>
@@ -210,7 +210,7 @@ export function SiteHeader() {
               <Link to="/wishlist" aria-label="Wishlist" className="relative hover:text-primary p-1">
                 <Heart className="h-5 w-5" strokeWidth={1.8} />
                 {wishlist.length > 0 && (
-                  <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-accent px-1 text-[10px] font-bold text-accent-foreground">
+                  <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-bold text-primary-foreground shadow-xs">
                     {wishlist.length}
                   </span>
                 )}
@@ -222,7 +222,7 @@ export function SiteHeader() {
               >
                 <ShoppingCart className="h-5 w-5" strokeWidth={1.8} />
                 {cartCount > 0 && (
-                  <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-accent px-1 text-[10px] font-bold text-accent-foreground">
+                  <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-bold text-primary-foreground shadow-xs">
                     {cartCount}
                   </span>
                 )}
@@ -241,7 +241,7 @@ export function SiteHeader() {
           </div>
         </div>
 
-        <div className="border-t border-border bg-cream relative">
+        <div className="border-t border-border bg-card relative">
           <div className="mx-auto flex max-w-7xl items-center gap-3 sm:gap-6 px-4 py-2">
             {/* Shop by Category hover dropdown */}
             <div

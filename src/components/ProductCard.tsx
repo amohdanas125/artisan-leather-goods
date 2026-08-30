@@ -34,7 +34,7 @@ export function ProductCard({ product, listName }: { product: Product; listName:
         }
         className="flex flex-1 flex-col"
       >
-        <div className="aspect-square w-full overflow-hidden bg-muted">
+        <div className="aspect-square w-full overflow-hidden bg-card border-b border-border/40">
           <img
             src={product.img}
             alt={product.name}
@@ -46,8 +46,8 @@ export function ProductCard({ product, listName }: { product: Product; listName:
         </div>
 
         <div className="flex flex-1 flex-col p-4">
-          <div className="flex items-center gap-1 text-xs font-semibold text-accent-foreground">
-            <Star className="h-3.5 w-3.5 fill-accent text-accent" />
+          <div className="flex items-center gap-1 text-xs font-bold text-primary">
+            <Star className="h-3.5 w-3.5 fill-primary text-primary" />
             {product.rating.toFixed(1)}
             <span className="font-normal text-muted-foreground">({product.reviews})</span>
           </div>
