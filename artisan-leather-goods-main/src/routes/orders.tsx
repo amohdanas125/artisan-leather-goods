@@ -191,7 +191,7 @@ function CustomerOrdersPage() {
               return (
                 <div
                   key={order.id}
-                  className="overflow-hidden rounded-3xl border border-border bg-card shadow-xs transition-shadow hover:shadow-md"
+                  className="overflow-hidden rounded-3xl border border-border/60 bg-[#F0E8DE] sm:bg-card shadow-xs transition-shadow hover:shadow-md"
                 >
                   {/* Order Card Header */}
                   <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border/70 bg-muted/30 px-6 py-4">

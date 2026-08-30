@@ -333,7 +333,7 @@ function ProductPage() {
             </button>
           </div>
 
-          <ul className="mt-8 space-y-2 rounded-2xl border border-border bg-card p-5">
+          <ul className="mt-8 space-y-2 rounded-2xl border border-border/60 bg-[#F0E8DE] sm:bg-card p-5">
             {product.details.map((d) => (
               <li key={d} className="flex items-start gap-2 text-sm text-secondary-foreground">
                 <Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" />

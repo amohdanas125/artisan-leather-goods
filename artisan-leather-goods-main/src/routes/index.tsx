@@ -219,9 +219,9 @@ function Index() {
               to="/category/$slug"
               params={{ slug: o.slug }}
               onClick={() => track("promo_click", { promo: o.badge, title: o.title })}
-              className="group relative flex flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-card transition-all hover:shadow-lg"
+              className="group relative flex flex-col overflow-hidden rounded-2xl border border-border/60 bg-[#F0E8DE] sm:bg-card shadow-card transition-all hover:shadow-lg"
             >
-              <div className="relative aspect-[4/3] w-full overflow-hidden bg-card border-b border-border/40">
+              <div className="relative aspect-[4/3] w-full overflow-hidden bg-[#F0E8DE] sm:bg-card border-b border-border/40">
                 <span className="absolute left-3.5 top-3.5 z-10 rounded-full bg-primary px-3 py-1 text-[11px] font-extrabold uppercase text-primary-foreground shadow-xs">
                   {o.badge}
                 </span>
