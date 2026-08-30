@@ -205,13 +205,13 @@ function ProductPage() {
             height={1200}
             className="aspect-square w-full rounded-3xl object-cover shadow-product"
           />
-          <div className="mt-4 flex gap-3">
+          <div className="mt-4 flex gap-2.5 sm:gap-3 overflow-x-auto pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             {product.gallery.map((g, i) => (
               <button
                 key={g + i}
                 onClick={() => setActiveImg(g)}
                 aria-label={`View image ${i + 1}`}
-                className={`h-20 w-20 overflow-hidden rounded-xl border-2 ${
+                className={`h-16 w-16 sm:h-20 sm:w-20 shrink-0 overflow-hidden rounded-xl border-2 cursor-pointer transition-colors ${
                   activeImg === g ? "border-primary" : "border-border"
                 }`}
               >
@@ -292,20 +292,20 @@ function ProductPage() {
             </div>
           </div>
 
-          <div className="mt-7 flex flex-wrap items-center gap-3">
-            <div className="flex h-12 items-center rounded-full border border-border bg-card">
+          <div className="mt-7 flex flex-wrap items-center gap-2.5 sm:gap-3">
+            <div className="flex h-11 sm:h-12 items-center rounded-full border border-border bg-card shrink-0">
               <button
                 aria-label="Decrease quantity"
                 onClick={() => setQty((q) => Math.max(1, q - 1))}
-                className="h-full w-11 text-lg font-bold text-primary"
+                className="h-full w-9 sm:w-11 text-lg font-bold text-primary cursor-pointer hover:bg-muted/50 rounded-l-full"
               >
                 −
               </button>
-              <span className="w-8 text-center text-sm font-bold">{qty}</span>
+              <span className="w-7 sm:w-8 text-center text-sm font-bold">{qty}</span>
               <button
                 aria-label="Increase quantity"
                 onClick={() => setQty((q) => Math.min(10, q + 1))}
-                className="h-full w-11 text-lg font-bold text-primary"
+                className="h-full w-9 sm:w-11 text-lg font-bold text-primary cursor-pointer hover:bg-muted/50 rounded-r-full"
               >
                 +
               </button>
@@ -318,17 +318,18 @@ function ProductPage() {
                   description: `${product.name} · ${color} · ${size}`,
                 });
               }}
-              className="h-12 rounded-full bg-primary px-8 text-sm font-bold text-primary-foreground transition-colors hover:bg-primary-dark"
+              className="h-11 sm:h-12 flex-1 min-w-[130px] rounded-full bg-primary px-5 sm:px-8 text-xs sm:text-sm font-bold text-primary-foreground transition-colors hover:bg-primary-dark cursor-pointer shadow-xs"
             >
               Add to Cart
             </button>
 
             <button
               onClick={() => toggleWish(product.slug)}
-              className="flex h-12 items-center gap-2 rounded-full border-2 border-primary px-6 text-sm font-bold text-primary transition-colors hover:bg-primary hover:text-primary-foreground"
+              className="flex h-11 sm:h-12 items-center justify-center rounded-full border-2 border-primary px-4 sm:px-6 text-xs sm:text-sm font-bold text-primary transition-colors hover:bg-primary hover:text-primary-foreground cursor-pointer shrink-0"
+              aria-label="Wishlist"
             >
               <Heart className={`h-4 w-4 ${isWished(product.slug) ? "fill-current" : ""}`} />
-              {isWished(product.slug) ? "Saved" : "Wishlist"}
+              <span className="hidden sm:inline ml-1.5">{isWished(product.slug) ? "Saved" : "Wishlist"}</span>
             </button>
           </div>
 

@@ -19,7 +19,7 @@ export function NewsletterBand({ source }: { source: string }) {
           </p>
         </div>
         <form
-          className="flex w-full max-w-md gap-2"
+          className="flex w-full max-w-md flex-col sm:flex-row gap-3"
           onSubmit={(e) => {
             e.preventDefault();
             if (!email) return;
@@ -39,9 +39,9 @@ export function NewsletterBand({ source }: { source: string }) {
             onChange={(e) => setEmail(e.target.value)}
             placeholder="Enter your email address"
             aria-label="Email address"
-            className="h-12 flex-1 rounded-full bg-card px-5 text-sm outline-none placeholder:text-muted-foreground"
+            className="h-12 w-full flex-1 rounded-full bg-card px-5 text-sm outline-none placeholder:text-muted-foreground focus:ring-2 focus:ring-accent"
           />
-          <button className="h-12 rounded-full bg-accent px-7 text-sm font-bold text-accent-foreground">
+          <button className="h-12 w-full sm:w-auto shrink-0 rounded-full bg-accent px-7 text-sm font-bold text-accent-foreground transition-colors hover:bg-accent/90 cursor-pointer">
             {done ? "Subscribed" : "Subscribe"}
           </button>
         </form>

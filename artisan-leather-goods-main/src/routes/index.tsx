@@ -147,9 +147,9 @@ function Index() {
               height={1104}
               className="w-full rounded-3xl object-cover shadow-product"
             />
-            <div className="absolute -right-2 -top-6 flex h-28 w-28 flex-col items-center justify-center rounded-full bg-accent text-center text-accent-foreground shadow-card lg:h-32 lg:w-32">
-              <Sparkles className="mb-1 h-5 w-5" />
-              <span className="px-3 text-[11px] font-extrabold uppercase leading-tight tracking-wide">
+            <div className="absolute right-2 -top-4 sm:-right-2 sm:-top-6 flex h-24 w-24 sm:h-28 sm:w-28 lg:h-32 lg:w-32 flex-col items-center justify-center rounded-full bg-accent text-center text-accent-foreground shadow-card">
+              <Sparkles className="mb-1 h-4 w-4 sm:h-5 sm:w-5" />
+              <span className="px-2 text-[10px] sm:text-[11px] font-extrabold uppercase leading-tight tracking-wide">
                 100% Genuine Leather
               </span>
             </div>
@@ -158,7 +158,7 @@ function Index() {
       </section>
 
       {/* Category icon row */}
-      <section className="mx-auto max-w-7xl px-4 py-8 sm:py-12">
+      <section className="mx-auto max-w-7xl px-4 py-8 sm:py-12 overflow-hidden">
         {/* Mobile-only visual scroll sign */}
         <div className="mb-3 flex items-center justify-between text-xs sm:hidden">
           <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
