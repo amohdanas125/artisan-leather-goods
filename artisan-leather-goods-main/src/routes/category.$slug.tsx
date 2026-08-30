@@ -85,6 +85,12 @@ function CategoryPage() {
 
   const category =
     storeCategories.find((c) => c.slug === loaderData.category.slug) ?? loaderData.category;
+  const defaultCategoryImg = categories.find((c) => c.slug === category.slug)?.img;
+  const bannerImg =
+    category.img && !category.img.includes("hero-leather")
+      ? category.img
+      : (defaultCategoryImg || category.img);
+
   const items = useMemo(() => {
     const fromStore = products.filter((p) => p.category === category.slug);
     return fromStore.length > 0 ? fromStore : loaderData.items;
@@ -160,7 +166,7 @@ function CategoryPage() {
           </div>
           <div className="hidden justify-end lg:flex">
             <img
-              src={category.img}
+              src={bannerImg}
               alt={category.label}
               width={640}
               height={640}

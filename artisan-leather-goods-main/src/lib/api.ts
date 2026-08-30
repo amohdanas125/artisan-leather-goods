@@ -243,13 +243,27 @@ export function convertBackendProduct(p: BackendProduct) {
   };
 }
 
+export const DEFAULT_CATEGORY_IMAGES: Record<string, string> = {
+  bags: toteImg,
+  wallets: walletImg,
+  belts: beltImg,
+  footwear: bootsImg,
+  travel: duffelImg,
+};
+
 export function convertBackendCategory(c: BackendCategory) {
+  const fallback = DEFAULT_CATEGORY_IMAGES[c.slug] || toteImg;
+  const resolved =
+    c.imageUrl && !c.imageUrl.includes("hero-leather")
+      ? resolveImageUrl(c.imageUrl)
+      : fallback;
+
   return {
     id: c.id,
     slug: c.slug,
     label: c.name,
     blurb: c.blurb || "",
-    img: resolveImageUrl(c.imageUrl),
+    img: resolved || fallback,
   };
 }
 

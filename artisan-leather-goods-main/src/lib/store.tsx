@@ -312,7 +312,15 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     setWishlist(read<string[]>(WISH_KEY, []));
     setUser(read<User | null>(USER_KEY, null));
     setProducts(read<Product[]>(PRODUCTS_KEY, defaultProducts));
-    setCategories(read<CategoryItem[]>(CATEGORIES_KEY, defaultCategories));
+    const savedCategories = read<CategoryItem[]>(CATEGORIES_KEY, defaultCategories);
+    const sanitizedCategories = savedCategories.map((cat) => {
+      const defaultCat = defaultCategories.find((d) => d.slug === cat.slug);
+      if (defaultCat && (!cat.img || cat.img.includes("hero-leather"))) {
+        return { ...cat, img: defaultCat.img };
+      }
+      return cat;
+    });
+    setCategories(sanitizedCategories);
     setOrders(read<Order[]>(ORDERS_KEY, initialOrders));
     setHydrated(true);
 

@@ -33,11 +33,11 @@ const IMG = {
 const LEATHER_COLORS = ["Cognac", "Espresso", "Black", "Natural Tan"];
 
 const CATEGORIES = [
-  { slug: "bags", name: "Bags & Totes", blurb: "Totes, crossbodies and everyday carry in full-grain leather." },
-  { slug: "wallets", name: "Wallets & Cardholders", blurb: "Slim bifolds and card holders that break in beautifully." },
-  { slug: "belts", name: "Belts", blurb: "Hand-braided and solid-cut belts with brass hardware." },
-  { slug: "footwear", name: "Footwear", blurb: "Goodyear-welted boots and loafers built for resoling." },
-  { slug: "travel", name: "Travel & Duffels", blurb: "Weekenders and travel goods for a lifetime of trips." },
+  { slug: "bags", name: "Bags & Totes", blurb: "Totes, crossbodies and everyday carry in full-grain leather.", imageUrl: "p-tote.jpg" },
+  { slug: "wallets", name: "Wallets & Cardholders", blurb: "Slim bifolds and card holders that break in beautifully.", imageUrl: "p-wallet.jpg" },
+  { slug: "belts", name: "Belts", blurb: "Hand-braided and solid-cut belts with brass hardware.", imageUrl: "p-belt.jpg" },
+  { slug: "footwear", name: "Footwear", blurb: "Goodyear-welted boots and loafers built for resoling.", imageUrl: "p-boots.jpg" },
+  { slug: "travel", name: "Travel & Duffels", blurb: "Weekenders and travel goods for a lifetime of trips.", imageUrl: "p-duffel.jpg" },
 ] as const;
 
 type ProductSeed = {
@@ -375,17 +375,17 @@ async function seed() {
   for (const cat of CATEGORIES) {
     const [inserted] = await db
       .insert(schema.categories)
-      .values({ name: cat.name, slug: cat.slug, blurb: cat.blurb })
+      .values({ name: cat.name, slug: cat.slug, blurb: cat.blurb, imageUrl: cat.imageUrl })
       .onConflictDoNothing()
       .returning();
 
     let id = inserted?.id;
     if (!id) {
       const [existing] = await db
-        .select({ id: schema.categories.id })
-        .from(schema.categories)
+        .update(schema.categories)
+        .set({ imageUrl: cat.imageUrl, name: cat.name, blurb: cat.blurb })
         .where(eq(schema.categories.slug, cat.slug))
-        .limit(1);
+        .returning({ id: schema.categories.id });
       id = existing?.id;
     }
     if (id) categoryIdBySlug.set(cat.slug, id);

@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs>
+    <linearGradient id="leatherGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#9C5237" />
+      <stop offset="50%" stop-color="#8C4A32" />
+      <stop offset="100%" stop-color="#6B331E" />
+    </linearGradient>
+    <linearGradient id="brassGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FDE08B" />
+      <stop offset="50%" stop-color="#D4A373" />
+      <stop offset="100%" stop-color="#A27038" />
+    </linearGradient>
+    <filter id="leatherShadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="#000" flood-opacity="0.25" />
+    </filter>
+  </defs>
+
+  <!-- Background leather badge -->
+  <rect width="64" height="64" rx="18" fill="url(#leatherGrad)" />
+
+  <!-- Artisan leather perimeter stitch line -->
+  <rect x="4.5" y="4.5" width="55" height="55" rx="14" fill="none" stroke="#F5EBE1" stroke-width="1.2" stroke-dasharray="2.5 2" opacity="0.5" />
+
+  <!-- Leather Bag Handle -->
+  <path d="M25 19 C25 12 39 12 39 19" fill="none" stroke="url(#brassGrad)" stroke-width="3" stroke-linecap="round" />
+
+  <!-- Bag Body -->
+  <rect x="14" y="21" width="36" height="28" rx="6" fill="#582917" filter="url(#leatherShadow)" />
+  
+  <!-- Leather Flap -->
+  <path d="M14 23 C14 23 20 33 32 33 C44 33 50 23 50 23" fill="#8C4A32" stroke="#481F10" stroke-width="1" />
+  
+  <!-- Flap saddle stitching -->
+  <path d="M16 23.5 C17 24.5 21 31 32 31 C43 31 47 24.5 48 23.5" fill="none" stroke="#F5EBE1" stroke-width="1" stroke-dasharray="2 1.5" opacity="0.6" />
+
+  <!-- Brass Clasp / Turnlock -->
+  <rect x="30" y="31" width="4" height="6" rx="1.5" fill="url(#brassGrad)" stroke="#8A5A23" stroke-width="0.75" />
+  <circle cx="32" cy="34" r="0.8" fill="#582917" />
+
+  <!-- Corner reinforces -->
+  <circle cx="19" cy="44" r="1.5" fill="url(#brassGrad)" />
+  <circle cx="45" cy="44" r="1.5" fill="url(#brassGrad)" />
+</svg>
