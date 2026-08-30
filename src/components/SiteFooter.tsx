@@ -1,5 +1,8 @@
 import { Link } from "@tanstack/react-router";
 import { Backpack, Facebook, Instagram, Play, Youtube } from "lucide-react";
+import { toast } from "sonner";
+
+import { useStore } from "@/lib/store";
 
 const footerCols = [
   {
@@ -14,18 +17,40 @@ const footerCols = [
   },
 ];
 
-const plainCols = [
-  {
-    title: "Customer Service",
-    links: ["Track Order", "Shipping & Returns", "Leather Care Guide", "FAQs", "Contact Us"],
-  },
-  {
-    title: "My Account",
-    links: ["Login / Sign Up", "Order History", "Wishlist", "Saved Addresses", "Gift Cards"],
-  },
-];
-
 export function SiteFooter() {
+  const { user, openAuthModal } = useStore();
+
+  const handleAccountClick = (link: string, e: React.MouseEvent) => {
+    e.preventDefault();
+    if (link === "Login / Sign Up") {
+      if (user) {
+        toast.info(`You are logged in as ${user.name} (${user.email}).`);
+      } else {
+        openAuthModal("login");
+      }
+    } else if (link === "Wishlist") {
+      // Handled by Link
+    } else if (link === "Order History") {
+      if (!user) {
+        openAuthModal("login");
+        toast.info("Please sign in to view your order history.");
+      } else {
+        toast.info("You currently have no past orders.");
+      }
+    } else if (link === "Saved Addresses") {
+      if (!user) {
+        openAuthModal("login");
+        toast.info("Please sign in to view your saved addresses.");
+      } else {
+        toast.info("No saved addresses found. Add one during checkout!");
+      }
+    } else if (link === "Gift Cards") {
+      toast.info("Gift cards will be available in our upcoming seasonal collection!");
+    } else {
+      toast.info(`${link} information will be updated shortly.`);
+    }
+  };
+
   return (
     <footer className="bg-ink text-ink-foreground">
       <div className="mx-auto max-w-7xl px-4 py-14">
@@ -38,13 +63,21 @@ export function SiteFooter() {
             <div className="mt-5 flex gap-3">
               <a
                 href="#"
-                className="flex h-9 items-center gap-2 rounded-lg border border-ink-foreground/25 px-3 text-xs"
+                onClick={(e) => {
+                  e.preventDefault();
+                  toast.info("Terracotta Android App coming soon to Google Play!");
+                }}
+                className="flex h-9 items-center gap-2 rounded-lg border border-ink-foreground/25 px-3 text-xs cursor-pointer hover:border-accent hover:text-accent transition-colors"
               >
                 <Play className="h-3.5 w-3.5" /> Google Play
               </a>
               <a
                 href="#"
-                className="flex h-9 items-center gap-2 rounded-lg border border-ink-foreground/25 px-3 text-xs"
+                onClick={(e) => {
+                  e.preventDefault();
+                  toast.info("Terracotta iOS App coming soon to App Store!");
+                }}
+                className="flex h-9 items-center gap-2 rounded-lg border border-ink-foreground/25 px-3 text-xs cursor-pointer hover:border-accent hover:text-accent transition-colors"
               >
                 <Backpack className="h-3.5 w-3.5" /> App Store
               </a>
@@ -53,9 +86,7 @@ export function SiteFooter() {
 
           {footerCols.map((col) => (
             <div key={col.title}>
-              <h3 className="text-sm font-bold uppercase tracking-wide text-accent">
-                {col.title}
-              </h3>
+              <h3 className="text-sm font-bold uppercase tracking-wide text-accent">{col.title}</h3>
               <ul className="mt-4 space-y-2.5 text-sm text-ink-foreground/70">
                 {col.links.map((l) => (
                   <li key={l.label}>
@@ -72,22 +103,77 @@ export function SiteFooter() {
             </div>
           ))}
 
-          {plainCols.map((col) => (
-            <div key={col.title}>
-              <h3 className="text-sm font-bold uppercase tracking-wide text-accent">
-                {col.title}
-              </h3>
-              <ul className="mt-4 space-y-2.5 text-sm text-ink-foreground/70">
-                {col.links.map((l) => (
-                  <li key={l}>
-                    <a href="#" className="hover:text-accent">
-                      {l}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
+          <div>
+            <h3 className="text-sm font-bold uppercase tracking-wide text-accent">
+              Customer Service
+            </h3>
+            <ul className="mt-4 space-y-2.5 text-sm text-ink-foreground/70">
+              {[
+                "Track Order",
+                "Shipping & Returns",
+                "Leather Care Guide",
+                "FAQs",
+                "Contact Us",
+              ].map((l) => (
+                <li key={l}>
+                  <button
+                    type="button"
+                    onClick={(e) => handleAccountClick(l, e)}
+                    className="hover:text-accent cursor-pointer text-left"
+                  >
+                    {l}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div>
+            <h3 className="text-sm font-bold uppercase tracking-wide text-accent">My Account</h3>
+            <ul className="mt-4 space-y-2.5 text-sm text-ink-foreground/70">
+              <li>
+                <button
+                  type="button"
+                  onClick={(e) => handleAccountClick("Login / Sign Up", e)}
+                  className="hover:text-accent cursor-pointer text-left"
+                >
+                  {user ? `Logged In: ${user.name}` : "Login / Sign Up"}
+                </button>
+              </li>
+              <li>
+                <button
+                  type="button"
+                  onClick={(e) => handleAccountClick("Order History", e)}
+                  className="hover:text-accent cursor-pointer text-left"
+                >
+                  Order History
+                </button>
+              </li>
+              <li>
+                <Link to="/wishlist" className="hover:text-accent">
+                  Wishlist
+                </Link>
+              </li>
+              <li>
+                <button
+                  type="button"
+                  onClick={(e) => handleAccountClick("Saved Addresses", e)}
+                  className="hover:text-accent cursor-pointer text-left"
+                >
+                  Saved Addresses
+                </button>
+              </li>
+              <li>
+                <button
+                  type="button"
+                  onClick={(e) => handleAccountClick("Gift Cards", e)}
+                  className="hover:text-accent cursor-pointer text-left"
+                >
+                  Gift Cards
+                </button>
+              </li>
+            </ul>
+          </div>
         </div>
 
         <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-ink-foreground/15 pt-6 sm:flex-row">

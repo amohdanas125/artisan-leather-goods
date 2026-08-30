@@ -92,7 +92,10 @@ function OrderConfirmedPage() {
             <h2 className="text-lg font-extrabold text-ink">Order details</h2>
             <ul className="mt-4 divide-y divide-border">
               {order.items.map((i) => (
-                <li key={`${i.name}-${i.color}-${i.size}`} className="flex justify-between py-3 text-sm">
+                <li
+                  key={`${i.name}-${i.color}-${i.size}`}
+                  className="flex justify-between py-3 text-sm"
+                >
                   <span className="text-secondary-foreground">
                     {i.name}
                     <span className="block text-xs text-muted-foreground">
@@ -132,17 +135,23 @@ function OrderConfirmedPage() {
           </div>
         )}
 
-        <div className="mt-8 flex justify-center gap-3">
+        <div className="mt-8 flex flex-wrap justify-center gap-3">
+          <Link
+            to="/orders"
+            className="rounded-full bg-primary px-7 py-3 text-sm font-bold text-primary-foreground shadow-sm hover:bg-primary-dark transition-colors"
+          >
+            Track in My Orders
+          </Link>
           <Link
             to="/"
-            className="rounded-full bg-primary px-7 py-3 text-sm font-bold text-primary-foreground hover:bg-primary-dark"
+            className="rounded-full border border-border bg-card px-7 py-3 text-sm font-semibold text-ink shadow-2xs hover:border-primary transition-colors"
           >
             Back to Home
           </Link>
           <Link
             to="/category/$slug"
             params={{ slug: "wallets" }}
-            className="rounded-full border-2 border-primary px-7 py-3 text-sm font-bold text-primary hover:bg-primary hover:text-primary-foreground"
+            className="rounded-full border-2 border-primary px-7 py-3 text-sm font-bold text-primary hover:bg-primary hover:text-primary-foreground transition-colors"
           >
             Keep Shopping
           </Link>

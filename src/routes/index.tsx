@@ -1,9 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import {
   Briefcase,
   Footprints,
   Luggage,
+  MoveRight,
   ShoppingBag,
   Sparkles,
   Shirt,
@@ -80,14 +81,23 @@ const offers = [
   { badge: "₹500 OFF", title: "On Your First Order", img: beltImg, slug: "belts" },
 ] as const;
 
+import { useStore } from "@/lib/store";
+
 function Index() {
+  const { products } = useStore();
+
+  const homeBestSellers = useMemo(() => {
+    const sellers = products.filter((p) => p.bestSeller);
+    return sellers.length > 0 ? sellers.slice(0, 8) : products.slice(0, 8);
+  }, [products]);
+
   useEffect(() => {
     track("view_home", { page: "home" });
     track("view_item_list", {
       item_list_name: "home_best_sellers",
-      item_count: bestSellers.length,
+      item_count: homeBestSellers.length,
     });
-  }, []);
+  }, [homeBestSellers.length]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -106,8 +116,8 @@ function Index() {
               to Last a Lifetime
             </h1>
             <p className="mt-5 max-w-md text-base leading-relaxed text-muted-foreground">
-              Everything from everyday carry to travel essentials — made from full-grain
-              leather that only gets better with age.
+              Everything from everyday carry to travel essentials — made from full-grain leather
+              that only gets better with age.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link
@@ -148,38 +158,54 @@ function Index() {
       </section>
 
       {/* Category icon row */}
-      <section className="mx-auto max-w-7xl px-4 py-12">
-        <div className="flex flex-wrap items-start justify-center gap-x-6 gap-y-8 sm:justify-between">
-          {categoryTiles.map(({ label, slug, icon: Icon }) => (
+      <section className="mx-auto max-w-7xl px-4 py-8 sm:py-12">
+        {/* Mobile-only visual scroll sign */}
+        <div className="mb-3 flex items-center justify-between text-xs sm:hidden">
+          <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+            Categories
+          </span>
+          <span className="flex items-center gap-1.5 text-[11px] font-semibold text-primary">
+            <span>Swipe to explore</span>
+            <MoveRight className="h-3.5 w-3.5 animate-pulse" />
+          </span>
+        </div>
+
+        <div className="relative">
+          <div className="flex items-start gap-4 overflow-x-auto pb-4 pt-1 sm:gap-6 sm:overflow-visible sm:pb-0 sm:pt-0 sm:justify-between [scrollbar-width:none] [&::-webkit-scrollbar]:hidden -mx-4 px-4 sm:mx-0 sm:px-0">
+            {categoryTiles.map(({ label, slug, icon: Icon }) => (
+              <Link
+                key={label}
+                to="/category/$slug"
+                params={{ slug }}
+                className="group flex w-20 shrink-0 flex-col items-center gap-2.5 text-center sm:w-24 sm:gap-3"
+              >
+                <span className="flex h-16 w-16 items-center justify-center rounded-full bg-cream transition-colors group-hover:bg-primary group-hover:text-primary-foreground sm:h-20 sm:w-20">
+                  <Icon
+                    className="h-7 w-7 text-primary transition-colors group-hover:text-primary-foreground sm:h-8 sm:w-8"
+                    strokeWidth={1.5}
+                  />
+                </span>
+                <span className="text-xs font-semibold leading-tight text-secondary-foreground">
+                  {label}
+                </span>
+              </Link>
+            ))}
             <Link
-              key={label}
               to="/category/$slug"
-              params={{ slug }}
-              className="group flex w-24 flex-col items-center gap-3 text-center"
+              params={{ slug: "bags" }}
+              className="group flex w-20 shrink-0 flex-col items-center gap-2.5 text-center sm:w-24 sm:gap-3"
             >
-              <span className="flex h-20 w-20 items-center justify-center rounded-full bg-cream transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
-                <Icon
-                  className="h-8 w-8 text-primary transition-colors group-hover:text-primary-foreground"
-                  strokeWidth={1.5}
-                />
+              <span className="flex h-16 w-16 items-center justify-center rounded-full border-2 border-dashed border-primary text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground sm:h-20 sm:w-20">
+                <span className="text-lg font-bold">→</span>
               </span>
-              <span className="text-xs font-semibold leading-tight text-secondary-foreground">
-                {label}
+              <span className="text-xs font-semibold leading-tight text-primary">
+                View All Categories
               </span>
             </Link>
-          ))}
-          <Link
-            to="/category/$slug"
-            params={{ slug: "bags" }}
-            className="flex w-24 flex-col items-center gap-3 text-center"
-          >
-            <span className="flex h-20 w-20 items-center justify-center rounded-full border-2 border-dashed border-primary text-primary">
-              <span className="text-lg font-bold">→</span>
-            </span>
-            <span className="text-xs font-semibold leading-tight text-primary">
-              View All Categories
-            </span>
-          </Link>
+          </div>
+
+          {/* Right-edge fade cue on small devices */}
+          <div className="pointer-events-none absolute -right-4 top-0 bottom-4 w-8 bg-gradient-to-l from-background to-transparent sm:hidden" />
         </div>
       </section>
 
@@ -188,31 +214,35 @@ function Index() {
         <h2 className="mb-6 text-2xl font-extrabold text-ink">Top Offers For You</h2>
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {offers.map((o) => (
-            <div
+            <Link
               key={o.badge + o.title}
-              className="relative overflow-hidden rounded-2xl border border-border bg-card p-5 shadow-card"
+              to="/category/$slug"
+              params={{ slug: o.slug }}
+              onClick={() => track("promo_click", { promo: o.badge, title: o.title })}
+              className="group relative flex flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-card transition-all hover:shadow-lg"
             >
-              <span className="absolute left-4 top-4 rounded-full bg-accent px-3 py-1 text-[11px] font-extrabold uppercase text-accent-foreground">
-                {o.badge}
-              </span>
-              <img
-                src={o.img}
-                alt={o.title}
-                loading="lazy"
-                width={640}
-                height={640}
-                className="mx-auto h-40 w-40 rounded-xl object-cover"
-              />
-              <p className="mt-4 text-sm font-semibold text-ink">{o.title}</p>
-              <Link
-                to="/category/$slug"
-                params={{ slug: o.slug }}
-                onClick={() => track("promo_click", { promo: o.badge, title: o.title })}
-                className="mt-3 inline-block text-sm font-bold text-primary hover:text-primary-dark"
-              >
-                Shop Now →
-              </Link>
-            </div>
+              <div className="relative aspect-[4/3] w-full overflow-hidden bg-cream">
+                <span className="absolute left-3.5 top-3.5 z-10 rounded-full bg-accent px-3 py-1 text-[11px] font-extrabold uppercase text-accent-foreground shadow-xs">
+                  {o.badge}
+                </span>
+                <img
+                  src={o.img}
+                  alt={o.title}
+                  loading="lazy"
+                  width={640}
+                  height={480}
+                  className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+                />
+              </div>
+              <div className="flex flex-1 flex-col justify-between p-4 sm:p-5">
+                <p className="text-sm font-semibold text-ink transition-colors group-hover:text-primary">
+                  {o.title}
+                </p>
+                <span className="mt-3 inline-block text-sm font-bold text-primary transition-colors group-hover:text-primary-dark">
+                  Shop Now →
+                </span>
+              </div>
+            </Link>
           ))}
         </div>
       </section>
@@ -229,8 +259,8 @@ function Index() {
             View All Products →
           </Link>
         </div>
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
-          {bestSellers.map((p) => (
+        <div className="grid gap-5 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+          {homeBestSellers.map((p) => (
             <ProductCard key={p.slug} product={p} listName="home_best_sellers" />
           ))}
         </div>

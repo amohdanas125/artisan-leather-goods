@@ -25,9 +25,9 @@ export const Route = createFileRoute("/wishlist")({
 });
 
 function WishlistPage() {
-  const { wishlist, hydrated, toggleWish, moveToCart } = useStore();
+  const { wishlist, getProductBySlug, hydrated, toggleWish, moveToCart } = useStore();
   const items = wishlist.flatMap((slug) => {
-    const p = getProduct(slug);
+    const p = getProductBySlug(slug) ?? getProduct(slug);
     return p ? [p] : [];
   });
 
@@ -83,9 +83,7 @@ function WishlistPage() {
                   </Link>
                   <div className="mt-2 flex items-baseline gap-2">
                     <span className="text-base font-extrabold text-primary">{inr(p.price)}</span>
-                    <span className="text-xs text-muted-foreground line-through">
-                      {inr(p.mrp)}
-                    </span>
+                    <span className="text-xs text-muted-foreground line-through">{inr(p.mrp)}</span>
                   </div>
                   <button
                     onClick={() => {

@@ -7,12 +7,7 @@ import { ProductCard } from "@/components/ProductCard";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
 import { TrustStrip } from "@/components/TrustStrip";
-import {
-  categories,
-  inr,
-  productsByCategory,
-  type CategorySlug,
-} from "@/data/catalog";
+import { categories, inr, productsByCategory, type CategorySlug } from "@/data/catalog";
 import { track } from "@/lib/analytics";
 
 const PRICE_BANDS = [
@@ -41,7 +36,10 @@ export const Route = createFileRoute("/category/$slug")({
     const c = loaderData?.category;
     if (!c) {
       return {
-        meta: [{ title: "Category unavailable — Terracotta" }, { name: "robots", content: "noindex" }],
+        meta: [
+          { title: "Category unavailable — Terracotta" },
+          { name: "robots", content: "noindex" },
+        ],
       };
     }
     const title = `${c.label} — Handcrafted Leather | Terracotta`;
@@ -79,17 +77,31 @@ export const Route = createFileRoute("/category/$slug")({
   component: CategoryPage,
 });
 
+import { useStore } from "@/lib/store";
+
 function CategoryPage() {
-  const { category, items } = Route.useLoaderData();
+  const loaderData = Route.useLoaderData();
+  const { products, categories: storeCategories } = useStore();
+
+  const category =
+    storeCategories.find((c) => c.slug === loaderData.category.slug) ?? loaderData.category;
+  const defaultCategoryImg = categories.find((c) => c.slug === category.slug)?.img;
+  const bannerImg =
+    category.img && !category.img.includes("hero-leather")
+      ? category.img
+      : (defaultCategoryImg || category.img);
+
+  const items = useMemo(() => {
+    const fromStore = products.filter((p) => p.category === category.slug);
+    return fromStore.length > 0 ? fromStore : loaderData.items;
+  }, [products, category.slug, loaderData.items]);
+
   const [band, setBand] = useState("all");
   const [sort, setSort] = useState("featured");
   const [colorFilter, setColorFilter] = useState<string[]>([]);
   const [minRating, setMinRating] = useState(0);
 
-  const allColors = useMemo(
-    () => Array.from(new Set(items.flatMap((p) => p.colors))),
-    [items],
-  );
+  const allColors = useMemo(() => Array.from(new Set(items.flatMap((p) => p.colors))), [items]);
 
   useEffect(() => {
     setBand("all");
@@ -140,7 +152,7 @@ function CategoryPage() {
       </nav>
 
       <section className="bg-cream">
-        <div className="mx-auto grid max-w-7xl items-center gap-8 px-4 py-10 lg:grid-cols-[1.2fr_1fr]">
+        <div className="mx-auto grid max-w-7xl items-center gap-8 px-4 py-10 lg:grid-cols-[1fr_auto]">
           <div>
             <h1 className="text-4xl font-extrabold leading-tight text-ink lg:text-5xl">
               {category.label}
@@ -152,13 +164,15 @@ function CategoryPage() {
               {items.length} products · free shipping above ₹2,999
             </p>
           </div>
-          <img
-            src={category.img}
-            alt={category.label}
-            width={800}
-            height={600}
-            className="hidden h-48 w-full rounded-3xl object-cover shadow-product lg:block"
-          />
+          <div className="hidden justify-end lg:flex">
+            <img
+              src={bannerImg}
+              alt={category.label}
+              width={640}
+              height={640}
+              className="h-48 w-68 rounded-3xl object-cover shadow-product xl:h-52 xl:w-72"
+            />
+          </div>
         </div>
       </section>
 
@@ -300,19 +314,15 @@ function CategoryPage() {
             ) : (
               <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
                 {filtered.map((p) => (
-                  <ProductCard
-                    key={p.slug}
-                    product={p}
-                    listName={`category_${category.slug}`}
-                  />
+                  <ProductCard key={p.slug} product={p} listName={`category_${category.slug}`} />
                 ))}
               </div>
             )}
 
             <p className="mt-8 text-xs text-muted-foreground">
               Prices from {inr(Math.min(...items.map((p) => p.price)))} to{" "}
-              {inr(Math.max(...items.map((p) => p.price)))}. All items are covered by our
-              lifetime stitch warranty.
+              {inr(Math.max(...items.map((p) => p.price)))}. All items are covered by our lifetime
+              stitch warranty.
             </p>
           </div>
         </div>

@@ -18,6 +18,8 @@ dist-ssr/
 */.tanstack/**
 .wrangler/
 */.wrangler/
+.netlify/
+*/.netlify/
 .dev.vars
 
 # Environment variables

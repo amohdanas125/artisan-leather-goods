@@ -9,7 +9,17 @@ import bootsImg from "@/assets/p-boots.jpg";
 
 export type CategorySlug = "bags" | "wallets" | "belts" | "footwear" | "travel";
 
+export type ProductVariant = {
+  id: string;
+  color: string;
+  size: string;
+  price?: string | null | undefined;
+  stockQty: number;
+  sku?: string | undefined;
+};
+
 export type Product = {
+  id?: string | undefined;
   slug: string;
   name: string;
   category: CategorySlug;
@@ -23,7 +33,8 @@ export type Product = {
   details: string[];
   colors: string[];
   sizes: string[];
-  bestSeller?: boolean;
+  bestSeller?: boolean | undefined;
+  variants?: ProductVariant[] | undefined;
 };
 
 export const categories: {
@@ -81,7 +92,7 @@ export const products: Product[] = [
     img: toteImg,
     gallery: [toteImg, heroImg, crossbodyImg],
     description:
-      "A structured everyday tote cut from a single hide of full-grain leather, saddle-stitched at the stress points and lined in brushed cotton twill. Fits a 15\" laptop with room to spare.",
+      'A structured everyday tote cut from a single hide of full-grain leather, saddle-stitched at the stress points and lined in brushed cotton twill. Fits a 15" laptop with room to spare.',
     details: [
       "Full-grain vegetable-tanned leather, 2.0mm",
       "Solid brass hardware, hand-burnished edges",
@@ -255,9 +266,9 @@ export const products: Product[] = [
     img: heroImg,
     gallery: [heroImg, toteImg, duffelImg],
     description:
-      "A padded 16\" laptop briefcase with a trolley sleeve, twin document compartments and a full-width rear zip pocket.",
+      'A padded 16" laptop briefcase with a trolley sleeve, twin document compartments and a full-width rear zip pocket.',
     details: [
-      "Padded 16\" laptop compartment",
+      'Padded 16" laptop compartment',
       "Trolley sleeve for travel",
       "Full-grain leather with brass feet",
       "Dimensions: 41 × 31 × 10 cm",
@@ -363,7 +374,7 @@ export const products: Product[] = [
       "A roll-top backpack with padded straps, a laptop sleeve and side entry so you never have to unroll it in a hurry.",
     details: [
       "Roll-top with leather strap closure",
-      "Padded 15\" laptop sleeve",
+      'Padded 15" laptop sleeve',
       "Quick side-entry zip",
       "Capacity: 22L",
     ],

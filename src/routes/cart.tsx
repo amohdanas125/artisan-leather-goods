@@ -108,9 +108,7 @@ function CartPage() {
                         </button>
                       </div>
                       <div className="text-right">
-                        <p className="text-base font-extrabold text-primary">
-                          {inr(l.lineTotal)}
-                        </p>
+                        <p className="text-base font-extrabold text-primary">{inr(l.lineTotal)}</p>
                         <p className="text-xs text-muted-foreground line-through">
                           {inr(l.product.mrp * l.qty)}
                         </p>
