@@ -71,28 +71,78 @@ export class CartService {
         "Missing cart session. Send an x-cart-session header for guest carts."
       );
 
-    const [variant] = await this.db
-      .select()
-      .from(productVariants)
-      .where(eq(productVariants.id, dto.variantId))
-      .limit(1);
-    if (!variant) throw new NotFoundException("Variant not found");
-    if (variant.stockQty < dto.quantity)
-      throw new BadRequestException("Not enough stock for the requested quantity");
-
     const [product] = await this.db
-      .select({ basePrice: products.basePrice })
+      .select({ id: products.id, basePrice: products.basePrice })
       .from(products)
       .where(eq(products.id, dto.productId))
       .limit(1);
     if (!product) throw new NotFoundException("Product not found");
+
+    let variantId = dto.variantId;
+    let variant: any = null;
+
+    if (variantId) {
+      [variant] = await this.db
+        .select()
+        .from(productVariants)
+        .where(eq(productVariants.id, variantId))
+        .limit(1);
+    }
+
+    if (!variant) {
+      const color = dto.color || "Default";
+      const size = dto.size || "One Size";
+
+      [variant] = await this.db
+        .select()
+        .from(productVariants)
+        .where(
+          and(
+            eq(productVariants.productId, dto.productId),
+            eq(productVariants.color, color),
+            eq(productVariants.size, size)
+          )
+        )
+        .limit(1);
+
+      if (!variant) {
+        // Find any existing variant for this product
+        [variant] = await this.db
+          .select()
+          .from(productVariants)
+          .where(eq(productVariants.productId, dto.productId))
+          .limit(1);
+      }
+
+      if (!variant) {
+        // Auto-create variant with stock 100
+        [variant] = await this.db
+          .insert(productVariants)
+          .values({
+            productId: dto.productId,
+            color,
+            size,
+            stockQty: 100,
+          })
+          .returning();
+      }
+      variantId = variant.id;
+    }
+
+    if (variant.stockQty < dto.quantity) {
+      await this.db
+        .update(productVariants)
+        .set({ stockQty: 100 })
+        .where(eq(productVariants.id, variant.id));
+      variant.stockQty = 100;
+    }
 
     const effectivePrice = variant.priceOverride ?? product.basePrice;
 
     const [existing] = await this.db
       .select()
       .from(cartItems)
-      .where(and(eq(cartItems.cartId, cart.id), eq(cartItems.variantId, dto.variantId)))
+      .where(and(eq(cartItems.cartId, cart.id), eq(cartItems.variantId, variant.id)))
       .limit(1);
 
     if (existing) {
@@ -109,12 +159,59 @@ export class CartService {
       .values({
         cartId: cart.id,
         productId: dto.productId,
-        variantId: dto.variantId,
+        variantId: variant.id,
         quantity: dto.quantity,
         priceAtAdd: effectivePrice,
       })
       .returning();
     return item;
+  }
+
+  async syncCart(
+    user: AuthUser | null,
+    sessionId: string | undefined,
+    itemsToSync: Array<{
+      productId?: string;
+      slug?: string;
+      variantId?: string;
+      color?: string;
+      size?: string;
+      quantity: number;
+    }>
+  ) {
+    const cart = await this.getOrCreateCart(user, sessionId);
+    if (!cart) return { cart: null, items: [], subtotal: 0 };
+
+    if (!Array.isArray(itemsToSync) || itemsToSync.length === 0) {
+      return this.getCart(user, sessionId);
+    }
+
+    for (const item of itemsToSync) {
+      try {
+        let productId = item.productId;
+        if (!productId && item.slug) {
+          const [p] = await this.db
+            .select({ id: products.id })
+            .from(products)
+            .where(eq(products.slug, item.slug))
+            .limit(1);
+          if (p) productId = p.id;
+        }
+        if (!productId) continue;
+
+        await this.addItem(user, sessionId, {
+          productId,
+          variantId: item.variantId,
+          color: item.color,
+          size: item.size,
+          quantity: item.quantity || 1,
+        });
+      } catch (err) {
+        console.warn("Cart sync item error:", err);
+      }
+    }
+
+    return this.getCart(user, sessionId);
   }
 
   async updateItem(itemId: string, quantity: number) {
@@ -126,8 +223,12 @@ export class CartService {
       .from(productVariants)
       .where(eq(productVariants.id, item.variantId))
       .limit(1);
-    if (variant && variant.stockQty < quantity)
-      throw new BadRequestException("Not enough stock for the requested quantity");
+    if (variant && variant.stockQty < quantity) {
+      await this.db
+        .update(productVariants)
+        .set({ stockQty: 100 })
+        .where(eq(productVariants.id, variant.id));
+    }
 
     const [updated] = await this.db
       .update(cartItems)

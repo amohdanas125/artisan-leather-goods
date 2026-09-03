@@ -152,12 +152,23 @@ function CheckoutPage() {
                   ? savedAddresses.find((a) => a.id === selectedAddressId)
                   : null;
 
+              const checkoutItems = lines.map((l) => ({
+                slug: l.slug,
+                color: l.color,
+                size: l.size,
+                quantity: l.qty,
+              }));
+
+              // Sync cart with backend first if needed
+              await api.cart.syncCart(checkoutItems).catch(() => {});
+
               const res = await api.checkout.placeOrder(
                 chosenAddress
                   ? {
                       addressId: chosenAddress.id,
                       paymentMethod: payment === "cod" ? "cod" : "online",
                       ...(appliedCoupon ? { couponCode: appliedCoupon.code } : {}),
+                      items: checkoutItems,
                     }
                   : {
                       newAddress: {
@@ -173,6 +184,7 @@ function CheckoutPage() {
                       },
                       paymentMethod: payment === "cod" ? "cod" : "online",
                       ...(appliedCoupon ? { couponCode: appliedCoupon.code } : {}),
+                      items: checkoutItems,
                     },
               );
 

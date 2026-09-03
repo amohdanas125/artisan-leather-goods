@@ -7,8 +7,10 @@ import { ProductCard } from "@/components/ProductCard";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
 import { TrustStrip } from "@/components/TrustStrip";
-import { categories, inr, productsByCategory, type CategorySlug } from "@/data/catalog";
+import { categories as defaultCategories, inr, productsByCategory, type CategorySlug, type Product } from "@/data/catalog";
 import { track } from "@/lib/analytics";
+import { api, convertBackendCategory, convertBackendProduct } from "@/lib/api";
+import { useStore, type CategoryItem } from "@/lib/store";
 
 const PRICE_BANDS = [
   { id: "all", label: "All prices", test: () => true },
@@ -27,10 +29,47 @@ const SORTS = [
 ];
 
 export const Route = createFileRoute("/category/$slug")({
-  loader: ({ params }) => {
-    const category = categories.find((c) => c.slug === params.slug);
+  loader: async ({ params }) => {
+    let category: CategoryItem | undefined = defaultCategories.find((c) => c.slug === params.slug);
+    let items: Product[] = productsByCategory(params.slug as CategorySlug);
+
+    // Check localStorage
+    if (typeof window !== "undefined") {
+      try {
+        const rawCats = window.localStorage.getItem("terracotta.categories.v1");
+        if (rawCats) {
+          const storedCats: CategoryItem[] = JSON.parse(rawCats);
+          const found = storedCats.find((c) => c.slug === params.slug);
+          if (found) category = found;
+        }
+        const rawProds = window.localStorage.getItem("terracotta.products.v1");
+        if (rawProds) {
+          const storedProds: Product[] = JSON.parse(rawProds);
+          const filtered = storedProds.filter((p) => p.category === params.slug);
+          if (filtered.length > 0) items = filtered;
+        }
+      } catch {}
+    }
+
+    // Check backend API if not found or empty
+    if (!category || items.length === 0) {
+      try {
+        const [catsRes, prodsRes] = await Promise.all([
+          api.categories.getAll().catch(() => null),
+          api.products.getAll({ category: params.slug, limit: 100 }).catch(() => null),
+        ]);
+        if (catsRes?.categories) {
+          const found = catsRes.categories.find((c) => c.slug === params.slug);
+          if (found) category = convertBackendCategory(found);
+        }
+        if (prodsRes?.products && prodsRes.products.length > 0) {
+          items = prodsRes.products.map(convertBackendProduct);
+        }
+      } catch {}
+    }
+
     if (!category) throw notFound();
-    return { category, items: productsByCategory(params.slug as CategorySlug) };
+    return { category, items };
   },
   head: ({ params, loaderData }) => {
     const c = loaderData?.category;
@@ -77,15 +116,13 @@ export const Route = createFileRoute("/category/$slug")({
   component: CategoryPage,
 });
 
-import { useStore } from "@/lib/store";
-
 function CategoryPage() {
   const loaderData = Route.useLoaderData();
   const { products, categories: storeCategories } = useStore();
 
   const category =
     storeCategories.find((c) => c.slug === loaderData.category.slug) ?? loaderData.category;
-  const defaultCategoryImg = categories.find((c) => c.slug === category.slug)?.img;
+  const defaultCategoryImg = defaultCategories.find((c) => c.slug === category.slug)?.img;
   const bannerImg =
     category.img && !category.img.includes("hero-leather")
       ? category.img
@@ -178,7 +215,7 @@ function CategoryPage() {
 
       <section className="mx-auto max-w-7xl px-4 py-10">
         <div className="grid gap-8 lg:grid-cols-[240px_1fr]">
-          <aside className="space-y-7">
+          <aside className="hidden lg:block space-y-7">
             <div className="flex items-center gap-2 text-sm font-extrabold text-ink">
               <SlidersHorizontal className="h-4 w-4 text-primary" /> Filters
             </div>
@@ -188,7 +225,7 @@ function CategoryPage() {
                 Category
               </h2>
               <ul className="mt-3 space-y-2 text-sm">
-                {categories.map((c) => (
+                {(storeCategories.length > 0 ? storeCategories : defaultCategories).map((c) => (
                   <li key={c.slug}>
                     <Link
                       to="/category/$slug"

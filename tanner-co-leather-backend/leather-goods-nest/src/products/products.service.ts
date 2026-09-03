@@ -92,6 +92,23 @@ export class ProductsService {
       },
     });
     if (!product) throw new NotFoundException("Product not found");
+
+    // Self-healing: if product has 0 variants, generate default variants
+    if (!product.variants || product.variants.length === 0) {
+      const colors = Array.isArray(product.colors) && product.colors.length > 0 ? product.colors : ["Default"];
+      const sizes = Array.isArray(product.sizes) && product.sizes.length > 0 ? product.sizes : ["One Size"];
+      const variantsToInsert = colors.flatMap((color) =>
+        sizes.map((size) => ({
+          productId: product.id,
+          color,
+          size,
+          stockQty: 100,
+        }))
+      );
+      const inserted = await this.db.insert(productVariants).values(variantsToInsert).returning();
+      product.variants = inserted;
+    }
+
     return product;
   }
 
@@ -113,6 +130,22 @@ export class ProductsService {
       with: { images: true, variants: true, category: true },
     });
     if (!product) throw new NotFoundException("Product not found");
+
+    if (!product.variants || product.variants.length === 0) {
+      const colors = Array.isArray(product.colors) && product.colors.length > 0 ? product.colors : ["Default"];
+      const sizes = Array.isArray(product.sizes) && product.sizes.length > 0 ? product.sizes : ["One Size"];
+      const variantsToInsert = colors.flatMap((color) =>
+        sizes.map((size) => ({
+          productId: product.id,
+          color,
+          size,
+          stockQty: 100,
+        }))
+      );
+      const inserted = await this.db.insert(productVariants).values(variantsToInsert).returning();
+      product.variants = inserted;
+    }
+
     return product;
   }
 
@@ -128,20 +161,32 @@ export class ProductsService {
       })
       .returning();
 
-    if (variants?.length) {
-      await this.db.insert(productVariants).values(
-        variants.map((v) => ({
-          productId: product.id,
-          color: v.color ?? "Default",
-          size: v.size ?? "One Size",
-          stockQty: v.stockQty ?? 0,
-          sku: v.sku,
-          priceOverride:
-            v.priceOverride !== undefined ? String(v.priceOverride) : undefined,
-          mrpOverride: v.mrpOverride !== undefined ? String(v.mrpOverride) : undefined,
-        }))
-      );
-    }
+    const colors = Array.isArray(productData.colors) && productData.colors.length > 0 ? productData.colors : ["Default"];
+    const sizes = Array.isArray(productData.sizes) && productData.sizes.length > 0 ? productData.sizes : ["One Size"];
+
+    const variantsToInsert =
+      variants && variants.length > 0
+        ? variants
+        : colors.flatMap((color) =>
+            sizes.map((size) => ({
+              color,
+              size,
+              stockQty: 100,
+            }))
+          );
+
+    await this.db.insert(productVariants).values(
+      variantsToInsert.map((v: any) => ({
+        productId: product.id,
+        color: v.color ?? "Default",
+        size: v.size ?? "One Size",
+        stockQty: v.stockQty ?? 100,
+        sku: v.sku,
+        priceOverride:
+          v.priceOverride !== undefined ? String(v.priceOverride) : undefined,
+        mrpOverride: v.mrpOverride !== undefined ? String(v.mrpOverride) : undefined,
+      }))
+    );
 
     return product;
   }
@@ -160,6 +205,23 @@ export class ProductsService {
       .returning();
 
     if (!updated) throw new NotFoundException("Product not found");
+
+    if (variants && variants.length > 0) {
+      await this.db.delete(productVariants).where(eq(productVariants.productId, id));
+      await this.db.insert(productVariants).values(
+        variants.map((v) => ({
+          productId: id,
+          color: v.color ?? "Default",
+          size: v.size ?? "One Size",
+          stockQty: v.stockQty ?? 100,
+          sku: v.sku,
+          priceOverride:
+            v.priceOverride !== undefined ? String(v.priceOverride) : undefined,
+          mrpOverride: v.mrpOverride !== undefined ? String(v.mrpOverride) : undefined,
+        }))
+      );
+    }
+
     return updated;
   }
 
@@ -177,7 +239,11 @@ export class ProductsService {
   async addImage(productId: string, dto: AddImageDto) {
     const [image] = await this.db
       .insert(productImages)
-      .values({ ...dto, productId })
+      .values({
+        ...dto,
+        b2FileKey: dto.b2FileKey || "product-image",
+        productId,
+      })
       .returning();
     return image;
   }

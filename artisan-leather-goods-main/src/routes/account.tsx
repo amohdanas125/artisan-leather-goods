@@ -306,7 +306,7 @@ function AccountPage() {
         <div className="mt-8 grid gap-8 lg:grid-cols-12">
           {/* Left Column: Personal Profile Form (4 cols) */}
           <div className="space-y-6 lg:col-span-4">
-            <div className="rounded-3xl border border-border/60 bg-[#F0E8DE] sm:bg-card p-6 shadow-xs">
+            <div className="rounded-3xl border border-border/60 bg-card p-6 shadow-xs">
               <div className="flex items-center gap-2 border-b border-border/60 pb-3">
                 <UserIcon className="h-4 w-4 text-primary" />
                 <h2 className="text-base font-bold text-ink">Personal Profile</h2>
@@ -411,7 +411,7 @@ function AccountPage() {
                 <span className="text-xs font-medium">Loading saved addresses…</span>
               </div>
             ) : addresses.length === 0 ? (
-              <div className="rounded-3xl border border-dashed border-border/60 bg-[#F0E8DE] sm:bg-card p-12 text-center">
+              <div className="rounded-3xl border border-dashed border-border/60 bg-card p-12 text-center">
                 <MapPin className="mx-auto h-10 w-10 text-muted-foreground/50 mb-3" />
                 <h3 className="text-base font-bold text-ink">No saved addresses yet</h3>
                 <p className="mt-1 text-xs text-muted-foreground">
@@ -431,8 +431,8 @@ function AccountPage() {
                 {addresses.map((addr) => (
                   <div
                     key={addr.id}
-                    className={`relative flex flex-col justify-between rounded-3xl border bg-[#F0E8DE] sm:bg-card p-5 shadow-xs transition-all ${
-                      addr.isDefault ? "border-primary/60 bg-[#F0E8DE] sm:bg-cream/30" : "border-border/60"
+                    className={`relative flex flex-col justify-between rounded-3xl border bg-card p-5 shadow-xs transition-all ${
+                      addr.isDefault ? "border-primary/60 bg-cream/30" : "border-border/60"
                     }`}
                   >
                     <div>

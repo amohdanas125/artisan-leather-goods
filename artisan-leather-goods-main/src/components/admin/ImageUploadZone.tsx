@@ -1,12 +1,14 @@
 import React, { useRef, useState } from "react";
-import { Check, ImagePlus, Link as LinkIcon, Trash2, Upload } from "lucide-react";
+import { Check, ImagePlus, Link as LinkIcon, Loader2, Trash2, Upload } from "lucide-react";
 import { toast } from "sonner";
+import { api } from "@/lib/api";
 
 interface ImageUploadZoneProps {
   value: string;
   onChange: (url: string) => void;
   presetImages?: Array<{ label: string; url: string }>;
   label?: string;
+  folder?: "products" | "categories";
 }
 
 /**
@@ -52,15 +54,17 @@ async function compressImageFile(file: File, maxDim = 1200, quality = 0.85): Pro
 }
 
 export function ImageUploadZone({
-  value,
+  value = "",
   onChange,
   presetImages = [],
   label = "Product Image",
+  folder = "products",
 }: ImageUploadZoneProps) {
   const [activeTab, setActiveTab] = useState<"upload" | "presets" | "url">("upload");
-  const [customUrl, setCustomUrl] = useState(
-    value && !value.startsWith("data:") && !presetImages.some((p) => p.url === value) ? value : "",
-  );
+  const [customUrl, setCustomUrl] = useState(() => {
+    const val = value || "";
+    return val && !val.startsWith("data:") && !(presetImages || []).some((p) => p.url === val) ? val : "";
+  });
   const [isDragging, setIsDragging] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -72,9 +76,24 @@ export function ImageUploadZone({
     }
     setIsProcessing(true);
     try {
+      // 1. Attempt uploading directly to Backblaze B2 via backend presigned URL
+      try {
+        const publicB2Url = await api.admin.upload.uploadFile(file, folder);
+        onChange(publicB2Url);
+        toast.success("Image uploaded directly to Backblaze B2!");
+        return;
+      } catch (uploadErr: any) {
+        console.warn("Direct B2 upload failed or backend not reachable, falling back to local processing:", uploadErr);
+        if (uploadErr?.message?.toLowerCase().includes("unauthorized")) {
+          toast.error("Admin session expired. Please Sign Out and log back in to upload to Backblaze B2.");
+        } else {
+          toast.error(`Storage upload error: ${uploadErr?.message || "Authentication required"}. Attached preview locally.`);
+        }
+      }
+
+      // 2. Fallback to local optimized base64 if backend is not reachable
       const compressedDataUrl = await compressImageFile(file);
       onChange(compressedDataUrl);
-      toast.success("Image uploaded successfully!");
     } catch (err) {
       toast.error("Could not process the selected image.");
     } finally {
@@ -172,10 +191,16 @@ export function ImageUploadZone({
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-1.5 text-xs font-bold text-emerald-700">
                   <Check className="h-3.5 w-3.5" />
-                  <span>Image Attached</span>
+                  <span>
+                    {typeof value === "string" && value.includes("backblazeb2.com")
+                      ? "Uploaded to Backblaze B2"
+                      : "Image Attached"}
+                  </span>
                 </div>
                 <p className="mt-1 truncate text-[11px] text-muted-foreground font-mono">
-                  {value.startsWith("data:") ? "Local File (Optimized)" : value}
+                  {typeof value === "string" && value.startsWith("data:")
+                    ? "Local File (Optimized)"
+                    : String(value || "")}
                 </p>
                 <div className="mt-2 flex items-center gap-2">
                   <button
@@ -204,7 +229,7 @@ export function ImageUploadZone({
               }}
               onDragLeave={() => setIsDragging(false)}
               onDrop={handleDrop}
-              onClick={() => fileInputRef.current?.click()}
+              onClick={() => !isProcessing && fileInputRef.current?.click()}
               className={`flex flex-col items-center justify-center rounded-2xl border-2 border-dashed p-6 text-center transition-all cursor-pointer ${
                 isDragging
                   ? "border-primary bg-primary/5 scale-[1.01]"
@@ -212,13 +237,17 @@ export function ImageUploadZone({
               }`}
             >
               <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary mb-2">
-                <Upload className="h-5 w-5" />
+                {isProcessing ? (
+                  <Loader2 className="h-5 w-5 animate-spin" />
+                ) : (
+                  <Upload className="h-5 w-5" />
+                )}
               </div>
               <p className="text-xs font-bold text-ink">
-                {isProcessing ? "Processing Image…" : "Click to Upload or Drag & Drop Image"}
+                {isProcessing ? "Uploading directly to Backblaze B2…" : "Click to Upload or Drag & Drop Image"}
               </p>
               <p className="mt-1 text-[11px] text-muted-foreground">
-                PNG, JPG, WebP supported
+                Auto-synced to Backblaze B2 Cloud Storage (PNG, JPG, WebP)
               </p>
             </div>
           )}

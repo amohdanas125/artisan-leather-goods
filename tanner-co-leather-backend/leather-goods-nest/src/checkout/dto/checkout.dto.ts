@@ -1,5 +1,5 @@
 import { Type } from "class-transformer";
-import { IsIn, IsOptional, IsString, IsUUID, ValidateNested } from "class-validator";
+import { IsArray, IsIn, IsOptional, IsString, IsUUID, ValidateNested } from "class-validator";
 import { AddressDto } from "@/addresses/dto/address.dto";
 
 export class CheckoutDto {
@@ -18,4 +18,15 @@ export class CheckoutDto {
   @IsOptional()
   @IsString()
   couponCode?: string;
+
+  @IsOptional()
+  @IsArray()
+  items?: Array<{
+    productId?: string;
+    slug?: string;
+    variantId?: string;
+    color?: string;
+    size?: string;
+    quantity: number;
+  }>;
 }

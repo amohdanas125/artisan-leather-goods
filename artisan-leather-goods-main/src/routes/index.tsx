@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo } from "react";
 import {
   Briefcase,
+  Flame,
   Footprints,
   Luggage,
   MoveRight,
@@ -12,13 +13,16 @@ import {
   Watch,
 } from "lucide-react";
 
+import { MobileHeroSlider } from "@/components/MobileHeroSlider";
 import { NewsletterBand } from "@/components/NewsletterBand";
 import { ProductCard } from "@/components/ProductCard";
+import { ProductSlider } from "@/components/ProductSlider";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
 import { TrustStrip } from "@/components/TrustStrip";
 import { bestSellers } from "@/data/catalog";
 import { track } from "@/lib/analytics";
+import { useStore } from "@/lib/store";
 
 import heroImg from "@/assets/hero-leather.jpg";
 import walletImg from "@/assets/p-wallet.jpg";
@@ -81,30 +85,39 @@ const offers = [
   { badge: "₹500 OFF", title: "On Your First Order", img: beltImg, slug: "belts" },
 ] as const;
 
-import { useStore } from "@/lib/store";
-
 function Index() {
   const { products } = useStore();
 
+  const homeNewArrivals = useMemo(() => {
+    return products.slice(0, 10);
+  }, [products]);
+
   const homeBestSellers = useMemo(() => {
     const sellers = products.filter((p) => p.bestSeller);
-    return sellers.length > 0 ? sellers.slice(0, 8) : products.slice(0, 8);
+    return sellers.length > 0 ? sellers.slice(0, 10) : products.slice(0, 10);
   }, [products]);
 
   useEffect(() => {
     track("view_home", { page: "home" });
     track("view_item_list", {
+      item_list_name: "home_new_arrivals",
+      item_count: homeNewArrivals.length,
+    });
+    track("view_item_list", {
       item_list_name: "home_best_sellers",
       item_count: homeBestSellers.length,
     });
-  }, [homeBestSellers.length]);
+  }, [homeNewArrivals.length, homeBestSellers.length]);
 
   return (
     <div className="min-h-screen bg-background">
       <SiteHeader />
 
-      {/* Hero */}
-      <section className="bg-muted/30">
+      {/* Mobile Auto-Slider Hero (Only on mobile devices) */}
+      <MobileHeroSlider />
+
+      {/* Desktop & Tablet Hero (Unchanged on larger screens) */}
+      <section className="hidden sm:block bg-muted/30">
         <div className="mx-auto grid max-w-7xl items-center gap-10 px-4 py-14 lg:grid-cols-2 lg:py-20">
           <div>
             <p className="text-xs font-bold tracking-[0.25em] text-primary">
@@ -124,7 +137,7 @@ function Index() {
                 to="/category/$slug"
                 params={{ slug: "bags" }}
                 onClick={() => track("cta_click", { cta: "hero_shop_now" })}
-                className="rounded-full bg-primary px-7 py-3 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary-dark"
+                className="rounded-full bg-primary px-7 py-3 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary-dark cursor-pointer"
               >
                 Shop Now
               </Link>
@@ -132,7 +145,7 @@ function Index() {
                 to="/category/$slug"
                 params={{ slug: "travel" }}
                 onClick={() => track("cta_click", { cta: "hero_view_collection" })}
-                className="rounded-full border-2 border-primary px-7 py-3 text-sm font-semibold text-primary transition-colors hover:bg-primary hover:text-primary-foreground"
+                className="rounded-full border-2 border-primary px-7 py-3 text-sm font-semibold text-primary transition-colors hover:bg-primary hover:text-primary-foreground cursor-pointer"
               >
                 View Collection
               </Link>
@@ -210,7 +223,7 @@ function Index() {
       </section>
 
       {/* Top offers */}
-      <section className="mx-auto max-w-7xl px-4 pb-12">
+      <section className="mx-auto max-w-7xl px-4 py-6 sm:py-8">
         <h2 className="mb-6 text-2xl font-extrabold text-ink">Top Offers For You</h2>
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {offers.map((o) => (
@@ -219,9 +232,9 @@ function Index() {
               to="/category/$slug"
               params={{ slug: o.slug }}
               onClick={() => track("promo_click", { promo: o.badge, title: o.title })}
-              className="group relative flex flex-col overflow-hidden rounded-2xl border border-border/60 bg-[#F0E8DE] sm:bg-card shadow-card transition-all hover:shadow-lg"
+              className="group relative flex flex-col overflow-hidden rounded-2xl border border-border/60 bg-card shadow-card transition-all hover:shadow-lg"
             >
-              <div className="relative aspect-[4/3] w-full overflow-hidden bg-[#F0E8DE] sm:bg-card border-b border-border/40">
+              <div className="relative aspect-[4/3] w-full overflow-hidden bg-card border-b border-border/40">
                 <span className="absolute left-3.5 top-3.5 z-10 rounded-full bg-primary px-3 py-1 text-[11px] font-extrabold uppercase text-primary-foreground shadow-xs">
                   {o.badge}
                 </span>
@@ -247,24 +260,27 @@ function Index() {
         </div>
       </section>
 
-      {/* Best selling products */}
-      <section className="mx-auto max-w-7xl px-4 pb-14">
-        <div className="mb-6 flex items-end justify-between">
-          <h2 className="text-2xl font-extrabold text-ink">Best Selling Products</h2>
-          <Link
-            to="/category/$slug"
-            params={{ slug: "bags" }}
-            className="text-sm font-bold text-primary hover:text-primary-dark"
-          >
-            View All Products →
-          </Link>
-        </div>
-        <div className="grid gap-5 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-          {homeBestSellers.map((p) => (
-            <ProductCard key={p.slug} product={p} listName="home_best_sellers" />
-          ))}
-        </div>
-      </section>
+      {/* New Arrivals Slider */}
+      <ProductSlider
+        title="New Arrivals"
+        subtitle="Fresh handcrafted leather additions from our master workshop"
+        badge="NEW ARRIVALS"
+        viewAllSlug="bags"
+        products={homeNewArrivals}
+        listName="home_new_arrivals"
+        icon={<Sparkles className="h-3.5 w-3.5 text-primary" />}
+      />
+
+      {/* Best selling products Slider */}
+      <ProductSlider
+        title="Best Selling Products"
+        subtitle="Our most cherished pieces, handmade to last a lifetime"
+        badge="BESTSELLERS"
+        viewAllSlug="bags"
+        products={homeBestSellers}
+        listName="home_best_sellers"
+        icon={<Flame className="h-3.5 w-3.5 text-primary" />}
+      />
 
       <TrustStrip />
       <NewsletterBand source="homepage" />

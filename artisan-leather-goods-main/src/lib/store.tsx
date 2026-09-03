@@ -264,7 +264,12 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         setCategories(catsRes.categories.map(convertBackendCategory));
       }
       if (prodsRes.products && prodsRes.products.length > 0) {
-        setProducts(prodsRes.products.map(convertBackendProduct));
+        const backendProds = prodsRes.products.map(convertBackendProduct);
+        setProducts((prev) => {
+          const localOnly = prev.filter((p) => p.id && p.id.startsWith("local-prod-"));
+          // Put local products alongside backend products so a refresh never wipes them
+          return [...backendProds, ...localOnly];
+        });
       }
     } catch (err) {
       console.warn("Failed to fetch catalog from backend, using fallback:", err);
@@ -388,10 +393,15 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       if (res.accessToken) setAuthToken(res.accessToken);
       if (res.user) setUser(res.user);
       setIsAuthModalOpen(false);
+      if (items.length > 0) {
+        await api.cart.syncCart(
+          items.map((i) => ({ slug: i.slug, color: i.color, size: i.size, quantity: i.qty }))
+        ).catch(() => {});
+      }
       await Promise.all([refreshCart(), refreshWishlist()]);
       track("login", { method: "email" });
     },
-    [refreshCart, refreshWishlist],
+    [items, refreshCart, refreshWishlist],
   );
 
   const signup = useCallback(
@@ -405,10 +415,15 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       if (res.accessToken) setAuthToken(res.accessToken);
       if (res.user) setUser(res.user);
       setIsAuthModalOpen(false);
+      if (items.length > 0) {
+        await api.cart.syncCart(
+          items.map((i) => ({ slug: i.slug, color: i.color, size: i.size, quantity: i.qty }))
+        ).catch(() => {});
+      }
       await Promise.all([refreshCart(), refreshWishlist()]);
       track("sign_up", { method: "email" });
     },
-    [refreshCart, refreshWishlist],
+    [items, refreshCart, refreshWishlist],
   );
 
   const logout = useCallback(() => {
@@ -520,8 +535,8 @@ export function StoreProvider({ children }: { children: ReactNode }) {
           }
         }
 
-        if (productId && variantId) {
-          await api.cart.addItem({ productId, variantId, quantity: qty });
+        if (productId) {
+          await api.cart.addItem({ productId, variantId, color, size, quantity: qty });
           await refreshCart();
         }
       } catch (err) {

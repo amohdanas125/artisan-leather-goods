@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
-import { S3Client, PutObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
+import { S3Client, PutObjectCommand, DeleteObjectCommand, GetObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { nanoid } from "nanoid";
 
@@ -52,5 +52,27 @@ export class UploadService {
 
   async deleteObject(key: string) {
     await this.client.send(new DeleteObjectCommand({ Bucket: this.bucket, Key: key }));
+  }
+
+  async streamMedia(key: string, res: any) {
+    try {
+      const cleanKey = key.replace(/^\/+/, "");
+      const s3Res = await this.client.send(
+        new GetObjectCommand({
+          Bucket: this.bucket,
+          Key: cleanKey,
+        })
+      );
+      res.setHeader("Content-Type", s3Res.ContentType || "image/jpeg");
+      res.setHeader("Cache-Control", "public, max-age=86400");
+      if (s3Res.ContentLength) {
+        res.setHeader("Content-Length", s3Res.ContentLength);
+      }
+      (s3Res.Body as any).pipe(res);
+    } catch (err: any) {
+      if (!res.headersSent) {
+        res.status(404).json({ message: "Media not found" });
+      }
+    }
   }
 }

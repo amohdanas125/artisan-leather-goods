@@ -19,7 +19,7 @@ import { toast } from "sonner";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
 import { inr } from "@/data/catalog";
-import { api } from "@/lib/api";
+import { api, resolveImageUrl } from "@/lib/api";
 import { useStore, type OrderStatus } from "@/lib/store";
 
 export const Route = createFileRoute("/orders")({
@@ -191,7 +191,7 @@ function CustomerOrdersPage() {
               return (
                 <div
                   key={order.id}
-                  className="overflow-hidden rounded-3xl border border-border/60 bg-[#F0E8DE] sm:bg-card shadow-xs transition-shadow hover:shadow-md"
+                  className="overflow-hidden rounded-3xl border border-border/60 bg-card shadow-xs transition-shadow hover:shadow-md"
                 >
                   {/* Order Card Header */}
                   <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border/70 bg-muted/30 px-6 py-4">
@@ -296,7 +296,7 @@ function CustomerOrdersPage() {
                           <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-xl border border-border bg-card">
                             {item.productImageSnapshot ? (
                               <img
-                                src={item.productImageSnapshot}
+                                src={resolveImageUrl(item.productImageSnapshot)}
                                 alt={item.productNameSnapshot}
                                 className="h-full w-full object-cover"
                               />

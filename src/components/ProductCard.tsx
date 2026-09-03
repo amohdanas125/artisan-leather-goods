@@ -9,7 +9,7 @@ export function ProductCard({ product, listName }: { product: Product; listName:
   const { addToCart, isWished, toggleWish } = useStore();
 
   return (
-    <div className="group relative flex flex-col overflow-hidden rounded-2xl border border-border/60 bg-[#F0E8DE] sm:bg-card shadow-card transition-all hover:shadow-lg">
+    <div className="group relative flex flex-col overflow-hidden rounded-2xl border border-border/60 bg-card shadow-card transition-all hover:shadow-lg">
       <button
         aria-label={isWished(product.slug) ? "Remove from wishlist" : "Save to wishlist"}
         onClick={(e) => {
@@ -17,7 +17,7 @@ export function ProductCard({ product, listName }: { product: Product; listName:
           e.stopPropagation();
           toggleWish(product.slug);
         }}
-        className="absolute right-3 top-3 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-[#F0E8DE]/90 sm:bg-card/90 text-muted-foreground shadow-card hover:text-primary cursor-pointer"
+        className="absolute right-3 top-3 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-card/90 text-muted-foreground shadow-card hover:text-primary cursor-pointer"
       >
         <Heart className={`h-4 w-4 ${isWished(product.slug) ? "fill-primary text-primary" : ""}`} />
       </button>
@@ -34,7 +34,7 @@ export function ProductCard({ product, listName }: { product: Product; listName:
         }
         className="flex flex-1 flex-col"
       >
-        <div className="aspect-square w-full overflow-hidden bg-[#F0E8DE] sm:bg-card border-b border-border/40">
+        <div className="aspect-square w-full overflow-hidden bg-card border-b border-border/40">
           <img
             src={product.img}
             alt={product.name}

@@ -105,6 +105,32 @@ export function CategoryCrudModal({
         );
         onClose();
       } catch (err: any) {
+        const isOfflineOrUnauthorized =
+          err?.message?.includes("Unauthorized") ||
+          err?.message?.includes("Failed to fetch") ||
+          err?.message?.includes("NetworkError") ||
+          err?.name === "TypeError";
+
+        if (isOfflineOrUnauthorized) {
+          const localCat = {
+            id: categoryToEdit?.id || `local-cat-${Date.now()}`,
+            slug: slug.trim(),
+            label: label.trim(),
+            blurb: blurb.trim() || "Handcrafted leather collection tailored for everyday elegance.",
+            img: img || toteImg,
+          };
+
+          if (categoryToEdit) {
+            updateCategory(categoryToEdit.slug, localCat);
+            toast.success(`Category "${label}" updated locally!`);
+          } else {
+            createCategory(localCat);
+            toast.success(`Category "${label}" created locally!`);
+          }
+          onClose();
+          return;
+        }
+
         toast.error(err.message || "Failed to save category.");
       }
     })();
@@ -171,6 +197,7 @@ export function CategoryCrudModal({
             onChange={setImg}
             presetImages={DEFAULT_CATEGORY_IMAGES}
             label="Category Thumbnail Photo"
+            folder="categories"
           />
 
           <DialogFooter className="border-t border-border/60 pt-4 flex gap-2 sm:justify-end">

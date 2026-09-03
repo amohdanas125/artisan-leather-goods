@@ -33,6 +33,17 @@ export function resolveImageUrl(urlOrKey?: string | null): string {
       return asset;
     }
   }
+  // If the image is hosted on Backblaze B2 private bucket, route via backend media proxy
+  if (urlOrKey.includes("backblazeb2.com/file/")) {
+    const match = urlOrKey.match(/backblazeb2\.com\/file\/[^/]+\/(.+)$/);
+    if (match && match[1]) {
+      return `${API_BASE_URL}/media/${match[1]}`;
+    }
+  }
+  if (urlOrKey.startsWith("products/") || urlOrKey.startsWith("/products/")) {
+    const cleanKey = urlOrKey.replace(/^\//, "");
+    return `${API_BASE_URL}/media/${cleanKey}`;
+  }
   return urlOrKey;
 }
 
@@ -341,10 +352,31 @@ export const api = {
         subtotal: number;
       }>("/cart");
     },
-    addItem: async (dto: { productId: string; variantId: string; quantity: number }) => {
+    addItem: async (dto: {
+      productId: string;
+      variantId?: string;
+      color?: string;
+      size?: string;
+      quantity: number;
+    }) => {
       return apiFetch<{ item: any }>("/cart", {
         method: "POST",
         body: JSON.stringify(dto),
+      });
+    },
+    syncCart: async (
+      items: Array<{
+        productId?: string;
+        slug?: string;
+        variantId?: string;
+        color?: string;
+        size?: string;
+        quantity: number;
+      }>
+    ) => {
+      return apiFetch<{ cart: { id: string }; items: any[]; subtotal: number }>("/cart/sync", {
+        method: "POST",
+        body: JSON.stringify({ items }),
       });
     },
     updateItem: async (itemId: string, quantity: number) => {
@@ -374,6 +406,14 @@ export const api = {
       } | undefined;
       paymentMethod: "online" | "cod";
       couponCode?: string | undefined;
+      items?: Array<{
+        productId?: string;
+        slug?: string;
+        variantId?: string;
+        color?: string;
+        size?: string;
+        quantity: number;
+      }>;
     }) => {
       return apiFetch<{ order: any; paymentOrder?: any }>("/checkout", {
         method: "POST",
@@ -383,10 +423,27 @@ export const api = {
   },
   orders: {
     getMyOrders: async () => {
-      return apiFetch<{ orders: any[] }>("/orders");
+      const res = await apiFetch<{ orders: any[] }>("/orders");
+      if (res?.orders) {
+        res.orders = res.orders.map((o) => ({
+          ...o,
+          items: (o.items || []).map((i: any) => ({
+            ...i,
+            productImageSnapshot: resolveImageUrl(i.productImageSnapshot),
+          })),
+        }));
+      }
+      return res;
     },
     getById: async (orderId: string) => {
-      return apiFetch<{ order: any }>(`/orders/${orderId}`);
+      const res = await apiFetch<{ order: any }>(`/orders/${orderId}`);
+      if (res?.order?.items) {
+        res.order.items = res.order.items.map((i: any) => ({
+          ...i,
+          productImageSnapshot: resolveImageUrl(i.productImageSnapshot),
+        }));
+      }
+      return res;
     },
   },
   coupons: {
@@ -568,6 +625,25 @@ export const api = {
           method: "DELETE",
         });
       },
+      addImage: async (
+        productId: string,
+        dto: { url: string; b2FileKey?: string; altText?: string; sortOrder?: number }
+      ) => {
+        return apiFetch<{ image: any }>(`/admin/products/${productId}/images`, {
+          method: "POST",
+          body: JSON.stringify({
+            url: dto.url,
+            b2FileKey: dto.b2FileKey || (dto.url.startsWith("http") ? dto.url.split("/").pop() || "product-image" : "product-image"),
+            altText: dto.altText || "",
+            sortOrder: dto.sortOrder ?? 0,
+          }),
+        });
+      },
+      deleteImage: async (productId: string, imageId: string) => {
+        return apiFetch<{ message: string }>(`/admin/products/${productId}/images/${imageId}`, {
+          method: "DELETE",
+        });
+      },
     },
     categories: {
       create: async (dto: { name: string; slug: string; blurb?: string | undefined; imageUrl?: string | undefined }) => {
@@ -594,10 +670,27 @@ export const api = {
     orders: {
       getAll: async (status?: string) => {
         const query = status && status !== "all" ? `?status=${encodeURIComponent(status)}` : "";
-        return apiFetch<{ orders: any[] }>(`/admin/orders${query}`);
+        const res = await apiFetch<{ orders: any[] }>(`/admin/orders${query}`);
+        if (res?.orders) {
+          res.orders = res.orders.map((o) => ({
+            ...o,
+            items: (o.items || []).map((i: any) => ({
+              ...i,
+              productImageSnapshot: resolveImageUrl(i.productImageSnapshot),
+            })),
+          }));
+        }
+        return res;
       },
       getById: async (id: string) => {
-        return apiFetch<{ order: any }>(`/admin/orders/${id}`);
+        const res = await apiFetch<{ order: any }>(`/admin/orders/${id}`);
+        if (res?.order?.items) {
+          res.order.items = res.order.items.map((i: any) => ({
+            ...i,
+            productImageSnapshot: resolveImageUrl(i.productImageSnapshot),
+          }));
+        }
+        return res;
       },
       updateStatus: async (
         id: string,
@@ -683,6 +776,32 @@ export const api = {
         return apiFetch<{ message: string }>(`/admin/reviews/${id}`, {
           method: "DELETE",
         });
+      },
+    },
+    upload: {
+      getPresignedUrl: async (folder: "products" | "categories" | "avatars", fileName: string, contentType: string) => {
+        return apiFetch<{ uploadUrl: string; publicUrl: string; key: string }>("/upload/presign", {
+          method: "POST",
+          body: JSON.stringify({ folder, fileName, contentType }),
+        });
+      },
+      uploadFile: async (file: File, folder: "products" | "categories" = "products"): Promise<string> => {
+        const { uploadUrl, publicUrl } = await api.admin.upload.getPresignedUrl(
+          folder,
+          file.name || "upload.jpg",
+          file.type || "image/jpeg"
+        );
+        const res = await fetch(uploadUrl, {
+          method: "PUT",
+          body: file,
+          headers: {
+            "Content-Type": file.type || "image/jpeg",
+          },
+        });
+        if (!res.ok) {
+          throw new Error("Failed to upload image directly to storage bucket.");
+        }
+        return publicUrl;
       },
     },
   },

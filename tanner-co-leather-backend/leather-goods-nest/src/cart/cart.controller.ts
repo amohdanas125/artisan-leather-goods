@@ -25,6 +25,15 @@ export class CartController {
     return { item: await this.cartService.addItem(user, sessionId, dto) };
   }
 
+  @Post("sync")
+  async syncCart(
+    @CurrentUser() user: AuthUser | null,
+    @CartSession() sessionId: string | undefined,
+    @Body() body: { items: any[] }
+  ) {
+    return this.cartService.syncCart(user, sessionId, body.items || []);
+  }
+
   @Patch(":itemId")
   async updateItem(@Param("itemId") itemId: string, @Body() dto: UpdateCartItemDto) {
     return { item: await this.cartService.updateItem(itemId, dto.quantity) };

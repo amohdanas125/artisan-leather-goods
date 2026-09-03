@@ -142,6 +142,15 @@ export function ProductCrudModal({
       .filter(Boolean);
 
     const selectedCat = categories.find((c) => c.slug === category);
+    const resolvedColors = finalColors.length > 0 ? finalColors : ["Cognac", "Espresso"];
+    const resolvedSizes = finalSizes.length > 0 ? finalSizes : ["One Size"];
+    const variants = resolvedColors.flatMap((color) =>
+      resolvedSizes.map((size) => ({
+        color,
+        size,
+        stockQty: 100,
+      }))
+    );
 
     const backendDto = {
       name: name.trim(),
@@ -153,27 +162,87 @@ export function ProductCrudModal({
         "Handcrafted with premium full-grain leather for lifelong durability.",
       details:
         finalDetails.length > 0 ? finalDetails : ["Full-grain leather", "Hand-stitched finish"],
-      colors: finalColors.length > 0 ? finalColors : ["Cognac", "Espresso"],
-      sizes: finalSizes.length > 0 ? finalSizes : ["One Size"],
+      colors: resolvedColors,
+      sizes: resolvedSizes,
+      variants,
       isBestSeller: bestSeller,
       ...(selectedCat?.id ? { categoryId: selectedCat.id } : {}),
     };
 
     (async () => {
       try {
+        let savedProductId = productToEdit?.id;
         if (productToEdit?.id) {
           await api.admin.products.update(productToEdit.id, backendDto);
         } else {
-          await api.admin.products.create(backendDto);
+          const createRes = await api.admin.products.create(backendDto);
+          savedProductId = createRes?.product?.id;
         }
+
+        // If product was created/updated on backend, and has an image, attach image
+        if (savedProductId && finalImg) {
+          try {
+            await api.admin.products.addImage(savedProductId, {
+              url: finalImg,
+              b2FileKey: finalImg.startsWith("http") ? finalImg.split("/").pop() || "product-image" : "product-image",
+              altText: name.trim(),
+            });
+          } catch (imgErr) {
+            console.warn("Could not attach image to backend product:", imgErr);
+          }
+        }
+
         await refreshCatalog();
         toast.success(
           productToEdit
-            ? `Product "${name}" updated successfully!`
-            : `Product "${name}" created successfully!`,
+            ? `Product "${name}" updated successfully on backend!`
+            : `Product "${name}" created successfully on backend!`,
         );
         onClose();
       } catch (err: any) {
+        // If backend is offline or unauthorized (offline demo admin session), fallback to local state
+        const isOfflineOrUnauthorized =
+          err?.message?.includes("Unauthorized") ||
+          err?.message?.includes("Failed to fetch") ||
+          err?.message?.includes("NetworkError") ||
+          err?.name === "TypeError";
+
+        if (isOfflineOrUnauthorized) {
+          const localProduct: Product = {
+            id: productToEdit?.id || `local-prod-${Date.now()}`,
+            slug: slug.trim(),
+            name: name.trim(),
+            category: (category as CategorySlug) || "bags",
+            price: Number(price),
+            mrp: Number(mrp),
+            rating: Number(rating) || 5.0,
+            reviews: Number(reviews) || 0,
+            img: finalImg,
+            gallery: [finalImg],
+            description:
+              description.trim() ||
+              "Handcrafted with premium full-grain leather for lifelong durability.",
+            details:
+              finalDetails.length > 0 ? finalDetails : ["Full-grain leather", "Hand-stitched finish"],
+            colors: finalColors.length > 0 ? finalColors : ["Cognac", "Espresso"],
+            sizes: finalSizes.length > 0 ? finalSizes : ["One Size"],
+            bestSeller: bestSeller,
+          };
+
+          if (productToEdit) {
+            updateProduct(productToEdit.slug, localProduct);
+          } else {
+            createProduct(localProduct);
+          }
+          if (err?.message?.includes("Unauthorized")) {
+            toast.error("Admin session expired or unauthorized. Product saved only locally for this browser session. Please sign out & back in to sync with database.");
+          } else {
+            toast.warning(`Backend offline (${err?.message || "Network error"}). Product "${name}" saved locally.`);
+          }
+          onClose();
+          return;
+        }
+
         toast.error(err.message || "Failed to save product.");
       }
     })();
@@ -181,11 +250,12 @@ export function ProductCrudModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto rounded-3xl border-border bg-card p-6 shadow-2xl">
-        <DialogHeader className="border-b border-border/60 pb-4">
-          <DialogTitle className="text-xl font-bold text-ink">
-            {productToEdit ? "Edit Product" : "Add New Product"}
-          </DialogTitle>
+      {isOpen && (
+        <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto rounded-3xl border-border bg-card p-6 shadow-2xl">
+          <DialogHeader className="border-b border-border/60 pb-4">
+            <DialogTitle className="text-xl font-bold text-ink">
+              {productToEdit ? "Edit Product" : "Add New Product"}
+            </DialogTitle>
           <DialogDescription className="text-xs text-muted-foreground">
             {productToEdit
               ? "Update product pricing, specifications, categories, and inventory details."
@@ -235,7 +305,7 @@ export function ProductCrudModal({
                 onChange={(e) => setCategory(e.target.value)}
                 className="h-10 w-full rounded-xl border border-border bg-background px-3 text-sm text-foreground outline-none focus:border-primary focus:ring-1 focus:ring-primary"
               >
-                {categories.map((c) => (
+                {(categories || []).map((c) => (
                   <option key={c.slug} value={c.slug}>
                     {c.label} ({c.slug})
                   </option>
@@ -399,7 +469,8 @@ export function ProductCrudModal({
             </button>
           </DialogFooter>
         </form>
-      </DialogContent>
+        </DialogContent>
+      )}
     </Dialog>
   );
 }

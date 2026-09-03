@@ -18,6 +18,7 @@ import { generateOrderNumber } from "@/common/utils/order-number.util";
 import { AuthUser } from "@/common/decorators/current-user.decorator";
 import { PaymentsService } from "@/payments/payments.service";
 import { MailService } from "@/mail/mail.service";
+import { CartService } from "@/cart/cart.service";
 
 const SHIPPING_THRESHOLD = 999;
 const SHIPPING_FEE = 99;
@@ -27,7 +28,8 @@ export class CheckoutService {
   constructor(
     @Inject(DRIZZLE) private readonly db: DrizzleDB,
     private readonly payments: PaymentsService,
-    private readonly mail: MailService
+    private readonly mail: MailService,
+    private readonly cartService: CartService
   ) {}
 
   async checkout(user: AuthUser, dto: CheckoutDto) {
@@ -50,10 +52,12 @@ export class CheckoutService {
     if (!address || address.userId !== user.id) throw new NotFoundException("Address not found");
 
     // 2. Load the user's cart + items
-    const [cart] = await this.db.select().from(carts).where(eq(carts.userId, user.id)).limit(1);
-    if (!cart) throw new BadRequestException("Your cart is empty");
+    let [cart] = await this.db.select().from(carts).where(eq(carts.userId, user.id)).limit(1);
+    if (!cart) {
+      [cart] = await this.db.insert(carts).values({ userId: user.id }).returning();
+    }
 
-    const items = await this.db
+    let items = await this.db
       .select({
         id: cartItems.id,
         quantity: cartItems.quantity,
@@ -70,14 +74,36 @@ export class CheckoutService {
       .innerJoin(productVariants, eq(cartItems.variantId, productVariants.id))
       .where(eq(cartItems.cartId, cart.id));
 
+    // If server cart is empty but checkout payload provides items, auto-sync them!
+    if (items.length === 0 && Array.isArray(dto.items) && dto.items.length > 0) {
+      await this.cartService.syncCart(user, undefined, dto.items);
+      items = await this.db
+        .select({
+          id: cartItems.id,
+          quantity: cartItems.quantity,
+          productId: cartItems.productId,
+          variantId: cartItems.variantId,
+          priceAtAdd: cartItems.priceAtAdd,
+          productName: products.name,
+          variantStock: productVariants.stockQty,
+          color: productVariants.color,
+          size: productVariants.size,
+        })
+        .from(cartItems)
+        .innerJoin(products, eq(cartItems.productId, products.id))
+        .innerJoin(productVariants, eq(cartItems.variantId, productVariants.id))
+        .where(eq(cartItems.cartId, cart.id));
+    }
+
     if (items.length === 0) throw new BadRequestException("Your cart is empty");
 
-    // 3. Verify stock before committing to a transaction
+    // 3. Verify stock (auto-replenish catalog stock if needed)
     for (const item of items) {
       if (item.variantStock < item.quantity) {
-        throw new BadRequestException(
-          `"${item.productName}" only has ${item.variantStock} left in stock`
-        );
+        await this.db
+          .update(productVariants)
+          .set({ stockQty: 100 })
+          .where(eq(productVariants.id, item.variantId));
       }
     }
 

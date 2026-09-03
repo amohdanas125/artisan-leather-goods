@@ -27,16 +27,39 @@ import { ProductCard } from "@/components/ProductCard";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
 import { TrustStrip } from "@/components/TrustStrip";
-import { categoryLabel, discountPct, getProduct, inr, productsByCategory } from "@/data/catalog";
+import { categoryLabel, discountPct, getProduct, inr, productsByCategory, type Product } from "@/data/catalog";
 import { track } from "@/lib/analytics";
-import { api } from "@/lib/api";
+import { api, convertBackendProduct } from "@/lib/api";
 import { useStore } from "@/lib/store";
 
 export const Route = createFileRoute("/product/$slug")({
-  loader: ({ params }) => {
-    const product = getProduct(params.slug);
-    if (!product) throw notFound();
-    return { product };
+  loader: async ({ params }) => {
+    // 1. Check static catalog
+    const staticProd = getProduct(params.slug);
+    if (staticProd) return { product: staticProd };
+
+    // 2. Check client localStorage if available
+    if (typeof window !== "undefined") {
+      try {
+        const raw = window.localStorage.getItem("terracotta.products.v1");
+        if (raw) {
+          const prods: Product[] = JSON.parse(raw);
+          const found = prods.find((p) => p.slug === params.slug);
+          if (found) return { product: found };
+        }
+      } catch {}
+    }
+
+    // 3. Check backend API
+    try {
+      const res = await api.products.getBySlug(params.slug);
+      if (res?.product) {
+        const converted = convertBackendProduct(res.product);
+        return { product: converted };
+      }
+    } catch {}
+
+    throw notFound();
   },
   head: ({ params, loaderData }) => {
     const p = loaderData?.product;
@@ -333,7 +356,7 @@ function ProductPage() {
             </button>
           </div>
 
-          <ul className="mt-8 space-y-2 rounded-2xl border border-border/60 bg-[#F0E8DE] sm:bg-card p-5">
+          <ul className="mt-8 space-y-2 rounded-2xl border border-border/60 bg-card p-5">
             {product.details.map((d) => (
               <li key={d} className="flex items-start gap-2 text-sm text-secondary-foreground">
                 <Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" />

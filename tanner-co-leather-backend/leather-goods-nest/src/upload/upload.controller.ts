@@ -1,4 +1,4 @@
-import { Body, Controller, ForbiddenException, Post, UseGuards } from "@nestjs/common";
+import { Body, Controller, ForbiddenException, Get, Post, Req, Res, UseGuards } from "@nestjs/common";
 import { JwtAuthGuard } from "@/common/guards/jwt-auth.guard";
 import { CurrentUser, AuthUser } from "@/common/decorators/current-user.decorator";
 import { UploadService } from "./upload.service";
@@ -21,5 +21,16 @@ export class UploadController {
       throw new ForbiddenException("Only admins can upload to this folder");
     }
     return this.uploadService.getPresignedUploadUrl(dto);
+  }
+}
+
+@Controller("media")
+export class MediaController {
+  constructor(private readonly uploadService: UploadService) {}
+
+  @Get("*")
+  async getMedia(@Req() req: any, @Res() res: any) {
+    const key = req.params[0] || req.path.replace(/^\/media\/?/, "");
+    await this.uploadService.streamMedia(key, res);
   }
 }
